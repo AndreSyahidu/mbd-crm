@@ -30,6 +30,24 @@ class Activator {
 	public static function activate(): void {
 		self::seed_options();
 
+		// Create module tables and CRM roles/capabilities.
+		\MBD\CRM\Leads\Module::install();
+		\MBD\CRM\Qualification\Module::install();
+		\MBD\CRM\FollowUp\Module::install();
+		\MBD\CRM\Discovery\Module::install();
+		\MBD\CRM\Deposit\Module::install();
+		\MBD\CRM\Planning\Module::install();
+		\MBD\CRM\Approval\Module::install();
+		\MBD\CRM\Closing\Module::install();
+		\MBD\CRM\Stakeholders\Module::install();
+		\MBD\CRM\Scoring\Module::install();
+		\MBD\CRM\Offers\Module::install();
+		\MBD\CRM\Handoff\Module::install();
+		\MBD\CRM\Reminders\Module::install();
+
+		// Record the installed schema version for idempotent upgrades.
+		Migrator::stamp_version();
+
 		// Ensure the route exists before flushing.
 		mbd_crm()->router()->add_rewrite_rules();
 		flush_rewrite_rules();

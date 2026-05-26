@@ -33,10 +33,70 @@ function mbd_crm_uninstall() {
 		return;
 	}
 
-	delete_option( MBD_CRM_UNINSTALL_OPTION );
+	global $wpdb;
 
-	// Placeholder: future data (custom tables, post meta, scheduled events)
-	// should be removed here as the CRM grows.
+	delete_option( MBD_CRM_UNINSTALL_OPTION );
+	delete_option( 'mbd_crm_master_options' );
+	delete_option( 'mbd_crm_db_version' );
+	delete_option( 'mbd_crm_reminders_enabled' );
+
+	// Stop the reminder cron event.
+	wp_clear_scheduled_hook( 'mbd_crm_daily_reminders' );
+
+	// Drop the Lead Intake module tables. Names are built from the trusted
+	// table prefix, not user input.
+	$mbd_crm_tables = array(
+		'mbd_crm_leads',
+		'mbd_crm_tasks',
+		'mbd_crm_audit',
+		'mbd_crm_stage_history',
+		'mbd_crm_qualifications',
+		'mbd_crm_followups',
+		'mbd_crm_promises',
+		'mbd_crm_discoveries',
+		'mbd_crm_deposits',
+		'mbd_crm_plannings',
+		'mbd_crm_deliverables',
+		'mbd_crm_revisions',
+		'mbd_crm_approvals',
+		'mbd_crm_closings',
+		'mbd_crm_negotiations',
+		'mbd_crm_stakeholders',
+		'mbd_crm_lead_score_history',
+		'mbd_crm_offers',
+		'mbd_crm_handoffs',
+	);
+	foreach ( $mbd_crm_tables as $mbd_crm_table ) {
+		$table = $wpdb->prefix . $mbd_crm_table;
+		$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery
+	}
+
+	// Remove the CRM roles created on activation.
+	foreach ( array( 'mbd_crm_owner', 'mbd_crm_sales', 'mbd_crm_viewer', 'mbd_crm_finance' ) as $mbd_crm_role ) {
+		remove_role( $mbd_crm_role );
+	}
+
+	// Revoke lead capabilities from administrators.
+	$mbd_crm_admin = get_role( 'administrator' );
+	if ( $mbd_crm_admin ) {
+		$mbd_crm_caps = array(
+			'mbd_crm_access_leads',
+			'mbd_crm_create_leads',
+			'mbd_crm_edit_leads',
+			'mbd_crm_edit_others_leads',
+			'mbd_crm_view_all_leads',
+			'mbd_crm_assign_leads',
+			'mbd_crm_verify_deposits',
+			'mbd_crm_override_deposit',
+			'mbd_crm_approve_closing',
+			'mbd_crm_merge_leads',
+			'mbd_crm_override_score',
+			'mbd_crm_approve_discount',
+		);
+		foreach ( $mbd_crm_caps as $mbd_crm_cap ) {
+			$mbd_crm_admin->remove_cap( $mbd_crm_cap );
+		}
+	}
 }
 
 if ( is_multisite() ) {

@@ -24,6 +24,9 @@ class Deactivator {
 	 * @return void
 	 */
 	public static function deactivate(): void {
+		// Stop the reminder cron; plugin data is preserved.
+		\MBD\CRM\Reminders\Module::uninstall();
+
 		flush_rewrite_rules();
 	}
 }
