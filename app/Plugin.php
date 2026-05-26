@@ -88,6 +88,13 @@ class Plugin {
 	private \MBD\CRM\Planning\Module $planning;
 
 	/**
+	 * Client Approval Evidence module.
+	 *
+	 * @var \MBD\CRM\Approval\Module
+	 */
+	private \MBD\CRM\Approval\Module $approval;
+
+	/**
 	 * Build the component graph.
 	 */
 	public function __construct() {
@@ -101,6 +108,7 @@ class Plugin {
 		$this->discovery     = new \MBD\CRM\Discovery\Module();
 		$this->deposit       = new \MBD\CRM\Deposit\Module();
 		$this->planning      = new \MBD\CRM\Planning\Module();
+		$this->approval      = new \MBD\CRM\Approval\Module();
 	}
 
 	/**
@@ -124,6 +132,7 @@ class Plugin {
 		$this->discovery->register();
 		$this->deposit->register();
 		$this->planning->register();
+		$this->approval->register();
 	}
 
 	/**

@@ -37,6 +37,7 @@ class Activator {
 		\MBD\CRM\Discovery\Module::install();
 		\MBD\CRM\Deposit\Module::install();
 		\MBD\CRM\Planning\Module::install();
+		\MBD\CRM\Approval\Module::install();
 
 		// Ensure the route exists before flushing.
 		mbd_crm()->router()->add_rewrite_rules();
