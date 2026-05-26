@@ -25,6 +25,9 @@ class Audit {
 	public const PROMISE_STATUS = 'lead.promise_status_changed';
 	public const DISCOVERY      = 'lead.discovery';
 	public const DEPOSIT        = 'lead.deposit';
+	public const PLANNING       = 'lead.planning';
+	public const APPROVAL       = 'lead.planning_approval';
+	public const CLOSING        = 'lead.closing';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -198,6 +201,19 @@ class Audit {
 					? sprintf( __( 'Deposit %1$s: %2$s', 'mbd-crm' ), $event, $dreason )
 					/* translators: %s: deposit event. */
 					: sprintf( __( 'Deposit %s', 'mbd-crm' ), $event );
+			case self::PLANNING:
+				/* translators: %s: planning event detail. */
+				return sprintf( __( 'Planning: %s', 'mbd-crm' ), (string) ( $detail['event'] ?? '' ) );
+			case self::APPROVAL:
+				return __( 'Planning approved by client', 'mbd-crm' );
+			case self::CLOSING:
+				$cevent  = (string) ( $detail['event'] ?? '' );
+				$creason = (string) ( $detail['reason'] ?? '' );
+				return '' !== $creason
+					/* translators: 1: closing event, 2: reason. */
+					? sprintf( __( 'Closing %1$s: %2$s', 'mbd-crm' ), $cevent, $creason )
+					/* translators: %s: closing event. */
+					: sprintf( __( 'Closing %s', 'mbd-crm' ), $cevent );
 		}
 
 		return $entry->action;
