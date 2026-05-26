@@ -100,6 +100,9 @@ $mbd_budget   = ( null !== $lead->estimated_budget && '' !== $lead->estimated_bu
 				<dt><?php esc_html_e( 'Next follow-up', 'mbd-crm' ); ?></dt>
 				<dd><?php echo esc_html( $lead->next_follow_up ? $lead->next_follow_up : '—' ); ?></dd>
 
+				<dt><?php esc_html_e( 'Next action', 'mbd-crm' ); ?></dt>
+				<dd><?php echo esc_html( isset( $lead->next_action ) && '' !== $lead->next_action ? $lead->next_action : '—' ); ?></dd>
+
 				<dt><?php esc_html_e( 'Assigned to', 'mbd-crm' ); ?></dt>
 				<dd><?php echo esc_html( $mbd_assignee ); ?></dd>
 

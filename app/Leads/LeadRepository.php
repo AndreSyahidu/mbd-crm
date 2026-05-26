@@ -213,6 +213,66 @@ class LeadRepository {
 	}
 
 	/**
+	 * Update the lead's "next action" and "next follow-up" surface fields
+	 * (written by the Follow-Up module when a follow-up is logged).
+	 *
+	 * @param int         $id          Lead ID.
+	 * @param string      $next_action Next action text.
+	 * @param string|null $next_date   Next follow-up date (Y-m-d) or null.
+	 * @return void
+	 */
+	public function set_next( int $id, string $next_action, ?string $next_date ): void {
+		global $wpdb;
+
+		$wpdb->update(
+			Schema::leads_table(),
+			array(
+				'next_action'    => $next_action,
+				'next_follow_up' => ( null === $next_date || '' === $next_date ) ? null : $next_date,
+				'updated_at'     => current_time( 'mysql' ),
+			),
+			array( 'id' => $id ),
+			array( '%s', '%s', '%s' ),
+			array( '%d' )
+		);
+	}
+
+	/**
+	 * Leads whose next follow-up is overdue, optionally scoped.
+	 *
+	 * @param string                                $today Today's date (Y-m-d).
+	 * @param array{scope?: string, user_id?: int}  $args  Query args.
+	 * @return array<int, object>
+	 */
+	public function overdue_followups( string $today, array $args = array() ): array {
+		global $wpdb;
+
+		$table   = Schema::leads_table();
+		$scope   = $args['scope'] ?? 'all';
+		$user_id = (int) ( $args['user_id'] ?? 0 );
+
+		if ( 'own' === $scope ) {
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$table} WHERE next_follow_up IS NOT NULL AND next_follow_up < %s AND status NOT IN ( 'won', 'lost' ) AND ( assigned_to = %d OR created_by = %d ) ORDER BY next_follow_up ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$today,
+					$user_id,
+					$user_id
+				)
+			);
+		} else {
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$table} WHERE next_follow_up IS NOT NULL AND next_follow_up < %s AND status NOT IN ( 'won', 'lost' ) ORDER BY next_follow_up ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$today
+				)
+			);
+		}
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
 	 * Set a lead's qualification status (written by the Qualification module).
 	 *
 	 * @param int    $id     Lead ID.

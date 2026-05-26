@@ -60,6 +60,13 @@ class Plugin {
 	private \MBD\CRM\Qualification\Module $qualification;
 
 	/**
+	 * Follow-Up & Promise module.
+	 *
+	 * @var \MBD\CRM\FollowUp\Module
+	 */
+	private \MBD\CRM\FollowUp\Module $followup;
+
+	/**
 	 * Build the component graph.
 	 */
 	public function __construct() {
@@ -69,6 +76,7 @@ class Plugin {
 		$this->health        = new HealthCheck();
 		$this->leads         = new \MBD\CRM\Leads\Module();
 		$this->qualification = new \MBD\CRM\Qualification\Module();
+		$this->followup      = new \MBD\CRM\FollowUp\Module();
 	}
 
 	/**
@@ -88,6 +96,7 @@ class Plugin {
 		$this->health->register();
 		$this->leads->register();
 		$this->qualification->register();
+		$this->followup->register();
 	}
 
 	/**

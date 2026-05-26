@@ -20,6 +20,9 @@ class Audit {
 	public const STATUS_CHANGED = 'lead.status_changed';
 	public const QUALIFIED      = 'lead.qualified';
 	public const DISQUALIFIED   = 'lead.disqualified';
+	public const FOLLOWUP       = 'lead.followup_logged';
+	public const PROMISE_MADE   = 'lead.promise_created';
+	public const PROMISE_STATUS = 'lead.promise_status_changed';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -163,6 +166,21 @@ class Audit {
 					/* translators: %s: reason. */
 					? sprintf( __( 'Marked not qualified: %s', 'mbd-crm' ), $reason )
 					: __( 'Marked not qualified', 'mbd-crm' );
+			case self::FOLLOWUP:
+				return sprintf(
+					/* translators: %s: channel. */
+					__( 'Follow-up logged (%s)', 'mbd-crm' ),
+					(string) ( $detail['channel'] ?? '' )
+				);
+			case self::PROMISE_MADE:
+				return __( 'Promise recorded', 'mbd-crm' );
+			case self::PROMISE_STATUS:
+				return sprintf(
+					/* translators: 1: previous status, 2: new status. */
+					__( 'Promise %1$s → %2$s', 'mbd-crm' ),
+					(string) ( $detail['from'] ?? '' ),
+					(string) ( $detail['to'] ?? '' )
+				);
 		}
 
 		return $entry->action;

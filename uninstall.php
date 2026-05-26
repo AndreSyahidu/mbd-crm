@@ -39,7 +39,7 @@ function mbd_crm_uninstall() {
 
 	// Drop the Lead Intake module tables. Names are built from the trusted
 	// table prefix, not user input.
-	foreach ( array( 'mbd_crm_leads', 'mbd_crm_tasks', 'mbd_crm_audit', 'mbd_crm_qualifications' ) as $mbd_crm_table ) {
+	foreach ( array( 'mbd_crm_leads', 'mbd_crm_tasks', 'mbd_crm_audit', 'mbd_crm_qualifications', 'mbd_crm_followups', 'mbd_crm_promises' ) as $mbd_crm_table ) {
 		$table = $wpdb->prefix . $mbd_crm_table;
 		$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery
 	}

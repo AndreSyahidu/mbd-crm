@@ -79,6 +79,7 @@ class Schema {
 			qualification varchar(20) NOT NULL DEFAULT '',
 			assigned_to bigint(20) unsigned NOT NULL DEFAULT 0,
 			next_follow_up date DEFAULT NULL,
+			next_action varchar(255) NOT NULL DEFAULT '',
 			notes longtext NOT NULL,
 			sla_started_at datetime DEFAULT NULL,
 			sla_due_at datetime DEFAULT NULL,

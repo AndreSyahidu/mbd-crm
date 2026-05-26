@@ -63,4 +63,13 @@ $mbd_cards = array(
 			?>
 		</div>
 	</section>
+
+	<?php
+	/**
+	 * Lets modules append dashboard widgets (e.g. overdue follow-ups).
+	 *
+	 * @param string $html Accumulated widget HTML.
+	 */
+	echo apply_filters( 'mbd_crm_dashboard_widgets', '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	?>
 </div>
