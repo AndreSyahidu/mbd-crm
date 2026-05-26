@@ -26,6 +26,7 @@ class Capabilities {
 	public const APPROVE_CLOSING    = 'mbd_crm_approve_closing';
 	public const MERGE_LEADS        = 'mbd_crm_merge_leads';
 	public const OVERRIDE_SCORE     = 'mbd_crm_override_score';
+	public const APPROVE_DISCOUNT   = 'mbd_crm_approve_discount';
 
 	/**
 	 * Every lead capability.
@@ -45,6 +46,7 @@ class Capabilities {
 			self::APPROVE_CLOSING,
 			self::MERGE_LEADS,
 			self::OVERRIDE_SCORE,
+			self::APPROVE_DISCOUNT,
 		);
 	}
 

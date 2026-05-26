@@ -32,6 +32,7 @@ class Audit {
 	public const STAKEHOLDER    = 'lead.stakeholder';
 	public const MERGE          = 'lead.merge';
 	public const SCORE          = 'lead.score_override';
+	public const OFFER          = 'lead.offer';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -256,6 +257,19 @@ class Audit {
 			case self::SCORE:
 				/* translators: 1: score, 2: reason. */
 				return sprintf( __( 'Score overridden to %1$d: %2$s', 'mbd-crm' ), (int) ( $detail['score'] ?? 0 ), (string) ( $detail['reason'] ?? '' ) );
+			case self::OFFER:
+				$event = (string) ( $detail['event'] ?? '' );
+				$ver   = (int) ( $detail['version'] ?? 0 );
+				$map   = array(
+					'created'  => __( 'Offer v%d created', 'mbd-crm' ),
+					'approved' => __( 'Offer v%d discount approved', 'mbd-crm' ),
+					'rejected' => __( 'Offer v%d discount rejected', 'mbd-crm' ),
+					'sent'     => __( 'Offer v%d sent to client', 'mbd-crm' ),
+					'accepted' => __( 'Offer v%d accepted', 'mbd-crm' ),
+					'declined' => __( 'Offer v%d declined', 'mbd-crm' ),
+				);
+				/* translators: %d: offer version number. */
+				return sprintf( $map[ $event ] ?? __( 'Offer v%d updated', 'mbd-crm' ), $ver );
 		}
 
 		return $entry->action;

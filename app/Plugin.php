@@ -130,6 +130,13 @@ class Plugin {
 	private \MBD\CRM\Scoring\Module $scoring;
 
 	/**
+	 * Offer versioning module.
+	 *
+	 * @var \MBD\CRM\Offers\Module
+	 */
+	private \MBD\CRM\Offers\Module $offers;
+
+	/**
 	 * Import / Export module.
 	 *
 	 * @var \MBD\CRM\IO\Module
@@ -156,6 +163,7 @@ class Plugin {
 		$this->stakeholders  = new \MBD\CRM\Stakeholders\Module();
 		$this->duplicates    = new \MBD\CRM\Duplicates\Module();
 		$this->scoring       = new \MBD\CRM\Scoring\Module();
+		$this->offers        = new \MBD\CRM\Offers\Module();
 		$this->io            = new \MBD\CRM\IO\Module();
 	}
 
@@ -190,6 +198,7 @@ class Plugin {
 		$this->stakeholders->register();
 		$this->duplicates->register();
 		$this->scoring->register();
+		$this->offers->register();
 		$this->io->register();
 	}
 

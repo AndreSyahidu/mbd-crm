@@ -59,6 +59,7 @@ function mbd_crm_uninstall() {
 		'mbd_crm_negotiations',
 		'mbd_crm_stakeholders',
 		'mbd_crm_lead_score_history',
+		'mbd_crm_offers',
 	);
 	foreach ( $mbd_crm_tables as $mbd_crm_table ) {
 		$table = $wpdb->prefix . $mbd_crm_table;
@@ -85,6 +86,7 @@ function mbd_crm_uninstall() {
 			'mbd_crm_approve_closing',
 			'mbd_crm_merge_leads',
 			'mbd_crm_override_score',
+			'mbd_crm_approve_discount',
 		);
 		foreach ( $mbd_crm_caps as $mbd_crm_cap ) {
 			$mbd_crm_admin->remove_cap( $mbd_crm_cap );
