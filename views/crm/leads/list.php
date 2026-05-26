@@ -9,7 +9,8 @@
  * @var bool                $can_create Whether the user may create leads.
  * @var string              $scope      'all' or 'own'.
  * @var string              $notice     Flash notice HTML.
- * @var string              $new_url    URL of the create form.
+ * @var string              $new_url      URL of the create form.
+ * @var int                 $highlight_id Newly created lead ID to highlight.
  */
 
 use MBD\CRM\Frontend\Components;
@@ -76,23 +77,23 @@ defined( 'ABSPATH' ) || exit;
 						$assignee  = $names[ (int) $lead->assigned_to ] ?? __( 'Unassigned', 'mbd-crm' );
 						$mbd_stale = Stage::staleness( $lead );
 						?>
-						<tr>
-							<td>
+						<tr class="<?php echo (int) $highlight_id === (int) $lead->id ? 'is-new' : ''; ?>">
+							<td data-label="<?php esc_attr_e( 'Lead', 'mbd-crm' ); ?>">
 								<a class="mbd-table__primary" href="<?php echo esc_url( $view_url ); ?>">
 									<?php echo esc_html( '' !== $lead->name ? $lead->name : __( '(no name)', 'mbd-crm' ) ); ?>
 								</a>
 							</td>
-							<td>
+							<td data-label="<?php esc_attr_e( 'Score', 'mbd-crm' ); ?>">
 								<strong><?php echo (int) ( $lead->score ?? 0 ); ?></strong>
 								<?php echo Components::chip( Scorer::temperature_label( (string) ( $lead->temperature ?? 'low_fit' ) ), Scorer::temperature_variant( (string) ( $lead->temperature ?? 'low_fit' ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</td>
-							<td><?php echo Components::chip( Options::label( 'statuses', $lead->status ), Options::status_variant( $lead->status ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-							<td><?php echo Components::chip( $lead->quality, Options::quality_variant( $lead->quality ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-							<td title="<?php echo esc_attr( $mbd_stale['stale'] ? $mbd_stale['reason'] : '' ); ?>"><?php echo Components::chip( Stage::aging_label( $lead ), $mbd_stale['stale'] ? 'danger' : 'muted' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-							<td><?php echo esc_html( $assignee ); ?></td>
-							<td><?php echo esc_html( $lead->next_follow_up ? $lead->next_follow_up : '—' ); ?></td>
-							<td><?php echo Components::chip( $sla['label'], $sla['variant'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-							<td class="mbd-table__actions">
+							<td data-label="<?php esc_attr_e( 'Status', 'mbd-crm' ); ?>"><?php echo Components::chip( Options::label( 'statuses', $lead->status ), Options::status_variant( $lead->status ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+							<td data-label="<?php esc_attr_e( 'Quality', 'mbd-crm' ); ?>"><?php echo Components::chip( $lead->quality, Options::quality_variant( $lead->quality ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+							<td data-label="<?php esc_attr_e( 'Stage age', 'mbd-crm' ); ?>" title="<?php echo esc_attr( $mbd_stale['stale'] ? $mbd_stale['reason'] : '' ); ?>"><?php echo Components::chip( Stage::aging_label( $lead ), $mbd_stale['stale'] ? 'danger' : 'muted' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+							<td data-label="<?php esc_attr_e( 'Assigned', 'mbd-crm' ); ?>"><?php echo esc_html( $assignee ); ?></td>
+							<td data-label="<?php esc_attr_e( 'Next follow-up', 'mbd-crm' ); ?>"><?php echo esc_html( $lead->next_follow_up ? $lead->next_follow_up : '—' ); ?></td>
+							<td data-label="<?php esc_attr_e( 'SLA', 'mbd-crm' ); ?>"><?php echo Components::chip( $sla['label'], $sla['variant'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+							<td data-label="<?php esc_attr_e( 'Actions', 'mbd-crm' ); ?>" class="mbd-table__actions">
 								<a href="<?php echo esc_url( $view_url ); ?>"><?php esc_html_e( 'View', 'mbd-crm' ); ?></a>
 								<?php if ( Permissions::can_edit( $lead ) ) : ?>
 									<a href="<?php echo esc_url( $edit_url ); ?>"><?php esc_html_e( 'Edit', 'mbd-crm' ); ?></a>
