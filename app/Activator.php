@@ -32,6 +32,7 @@ class Activator {
 
 		// Create module tables and CRM roles/capabilities.
 		\MBD\CRM\Leads\Module::install();
+		\MBD\CRM\Qualification\Module::install();
 
 		// Ensure the route exists before flushing.
 		mbd_crm()->router()->add_rewrite_rules();

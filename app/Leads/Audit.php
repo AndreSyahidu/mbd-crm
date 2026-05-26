@@ -18,6 +18,8 @@ class Audit {
 	public const CREATED        = 'lead.created';
 	public const UPDATED        = 'lead.updated';
 	public const STATUS_CHANGED = 'lead.status_changed';
+	public const QUALIFIED      = 'lead.qualified';
+	public const DISQUALIFIED   = 'lead.disqualified';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -149,6 +151,18 @@ class Audit {
 					/* translators: %s: comma-separated field names. */
 					? sprintf( __( 'Updated: %s', 'mbd-crm' ), $fields )
 					: __( 'Lead updated', 'mbd-crm' );
+			case self::QUALIFIED:
+				return sprintf(
+					/* translators: %d: qualification score. */
+					__( 'Marked qualified (score %d)', 'mbd-crm' ),
+					(int) ( $detail['score'] ?? 0 )
+				);
+			case self::DISQUALIFIED:
+				$reason = (string) ( $detail['reason'] ?? '' );
+				return '' !== $reason
+					/* translators: %s: reason. */
+					? sprintf( __( 'Marked not qualified: %s', 'mbd-crm' ), $reason )
+					: __( 'Marked not qualified', 'mbd-crm' );
 		}
 
 		return $entry->action;

@@ -154,7 +154,15 @@ class Controller {
 			$this->redirect( add_query_arg( 'updated', '1', Router::screen_url( 'leads' ) . '?lead=' . $lead_id ) );
 		}
 
-		return null;
+		/**
+		 * Allow other modules (e.g. Qualification) to handle a lead POST
+		 * action. A non-null return short-circuits and is rendered in the
+		 * shell; handlers that succeed should redirect and exit.
+		 *
+		 * @param string|null $handled Handler output.
+		 * @param string      $action  Submitted action.
+		 */
+		return apply_filters( 'mbd_crm_leads_post_action', null, $action );
 	}
 
 	/**

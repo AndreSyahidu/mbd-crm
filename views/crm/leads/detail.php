@@ -114,6 +114,17 @@ $mbd_budget   = ( null !== $lead->estimated_budget && '' !== $lead->estimated_bu
 		</section>
 
 		<div class="mbd-detail__side">
+			<?php
+			/**
+			 * Lets modules append panels (e.g. Qualification) to the lead
+			 * detail sidebar.
+			 *
+			 * @param string $html Accumulated panel HTML.
+			 * @param object $lead Lead row.
+			 */
+			echo apply_filters( 'mbd_crm_lead_detail_panels', '', $lead ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			?>
+
 			<section class="mbd-panel">
 				<h3 class="mbd-panel__title"><?php esc_html_e( 'Tasks', 'mbd-crm' ); ?></h3>
 				<?php if ( empty( $tasks ) ) : ?>

@@ -376,6 +376,18 @@ html, body.mbd-crm {
 
 .mbd-btn--whatsapp { background: #25d366; border-color: #25d366; color: #fff; }
 
+/* Qualification panel */
+.mbd-qual__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.mbd-qual__score { font-weight: 700; font-size: 14px; }
+.mbd-checklist { list-style: none; margin: 0 0 14px; padding: 0; }
+.mbd-checklist__item { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 14px; }
+.mbd-checklist__item.is-pass { color: var(--mbd-success-fg); }
+.mbd-checklist__item.is-fail { color: var(--mbd-muted); }
+.mbd-qual__form { margin: 0 0 12px; }
+.mbd-qual__form label { display: block; margin: 4px 0 6px; font-weight: 600; font-size: 13px; }
+.mbd-qual__form textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--mbd-border); border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
+.mbd-qual__discovery { margin-top: 4px; }
+
 @media (max-width: 860px) {
 	.mbd-field-row { grid-template-columns: 1fr; }
 	.mbd-detail__grid { grid-template-columns: 1fr; }

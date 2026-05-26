@@ -53,14 +53,22 @@ class Plugin {
 	private \MBD\CRM\Leads\Module $leads;
 
 	/**
+	 * Qualification module.
+	 *
+	 * @var \MBD\CRM\Qualification\Module
+	 */
+	private \MBD\CRM\Qualification\Module $qualification;
+
+	/**
 	 * Build the component graph.
 	 */
 	public function __construct() {
-		$this->router   = new Router();
-		$this->assets   = new Assets();
-		$this->settings = new Settings();
-		$this->health   = new HealthCheck();
-		$this->leads    = new \MBD\CRM\Leads\Module();
+		$this->router        = new Router();
+		$this->assets        = new Assets();
+		$this->settings      = new Settings();
+		$this->health        = new HealthCheck();
+		$this->leads         = new \MBD\CRM\Leads\Module();
+		$this->qualification = new \MBD\CRM\Qualification\Module();
 	}
 
 	/**
@@ -79,6 +87,7 @@ class Plugin {
 		$this->settings->register();
 		$this->health->register();
 		$this->leads->register();
+		$this->qualification->register();
 	}
 
 	/**

@@ -86,6 +86,41 @@ class LeadRepository {
 	}
 
 	/**
+	 * List leads with a given qualification status, optionally scoped.
+	 *
+	 * @param string                                $status Qualification status.
+	 * @param array{scope?: string, user_id?: int}  $args   Query args.
+	 * @return array<int, object>
+	 */
+	public function by_qualification( string $status, array $args = array() ): array {
+		global $wpdb;
+
+		$table   = Schema::leads_table();
+		$scope   = $args['scope'] ?? 'all';
+		$user_id = (int) ( $args['user_id'] ?? 0 );
+
+		if ( 'own' === $scope ) {
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$table} WHERE qualification = %s AND ( assigned_to = %d OR created_by = %d ) ORDER BY updated_at DESC, id DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$status,
+					$user_id,
+					$user_id
+				)
+			);
+		} else {
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$table} WHERE qualification = %s ORDER BY updated_at DESC, id DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$status
+				)
+			);
+		}
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
 	 * Insert a new lead, start its response SLA, and announce creation.
 	 *
 	 * @param array<string, mixed> $data    Sanitised field values.
@@ -175,6 +210,28 @@ class LeadRepository {
 		do_action( 'mbd_crm_lead_updated', $id, $changes );
 
 		return true;
+	}
+
+	/**
+	 * Set a lead's qualification status (written by the Qualification module).
+	 *
+	 * @param int    $id     Lead ID.
+	 * @param string $status Qualification status ('qualified', 'not_qualified', '').
+	 * @return void
+	 */
+	public function set_qualification( int $id, string $status ): void {
+		global $wpdb;
+
+		$wpdb->update(
+			Schema::leads_table(),
+			array(
+				'qualification' => $status,
+				'updated_at'    => current_time( 'mysql' ),
+			),
+			array( 'id' => $id ),
+			array( '%s', '%s' ),
+			array( '%d' )
+		);
 	}
 
 	/**

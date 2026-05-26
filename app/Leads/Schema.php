@@ -76,6 +76,7 @@ class Schema {
 			urgency varchar(20) NOT NULL DEFAULT '',
 			quality varchar(10) NOT NULL DEFAULT 'unknown',
 			status varchar(20) NOT NULL DEFAULT 'new',
+			qualification varchar(20) NOT NULL DEFAULT '',
 			assigned_to bigint(20) unsigned NOT NULL DEFAULT 0,
 			next_follow_up date DEFAULT NULL,
 			notes longtext NOT NULL,
