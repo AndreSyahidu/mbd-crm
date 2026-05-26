@@ -426,3 +426,6 @@ html, body.mbd-crm {
 .mbd-notif { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--mbd-surface); border: 1px solid var(--mbd-border); border-radius: var(--mbd-radius); margin-bottom: 10px; box-shadow: var(--mbd-shadow); }
 .mbd-notif__icon { color: var(--mbd-muted); }
 .mbd-notif__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+
+/* Closing approve row */
+.mbd-approve-row { display: flex; gap: 8px; margin-top: 8px; }

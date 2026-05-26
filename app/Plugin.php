@@ -95,6 +95,13 @@ class Plugin {
 	private \MBD\CRM\Approval\Module $approval;
 
 	/**
+	 * Closing and Negotiation module.
+	 *
+	 * @var \MBD\CRM\Closing\Module
+	 */
+	private \MBD\CRM\Closing\Module $closing;
+
+	/**
 	 * Build the component graph.
 	 */
 	public function __construct() {
@@ -109,6 +116,7 @@ class Plugin {
 		$this->deposit       = new \MBD\CRM\Deposit\Module();
 		$this->planning      = new \MBD\CRM\Planning\Module();
 		$this->approval      = new \MBD\CRM\Approval\Module();
+		$this->closing       = new \MBD\CRM\Closing\Module();
 	}
 
 	/**
@@ -133,6 +141,7 @@ class Plugin {
 		$this->deposit->register();
 		$this->planning->register();
 		$this->approval->register();
+		$this->closing->register();
 	}
 
 	/**
