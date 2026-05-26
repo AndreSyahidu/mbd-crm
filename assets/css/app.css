@@ -327,6 +327,38 @@ html, body.mbd-crm {
 .mbd-table tbody tr:hover { background: #fafbfd; }
 .mbd-table__primary { font-weight: 600; color: var(--mbd-primary); text-decoration: none; }
 .mbd-table__actions a { margin-right: 10px; text-decoration: none; color: var(--mbd-primary); }
+.mbd-table tbody tr.is-new { background: #eef4ff; }
+
+@media (max-width: 700px) {
+	.mbd-table thead { display: none; }
+	.mbd-table,
+	.mbd-table tbody,
+	.mbd-table tr,
+	.mbd-table td { display: block; width: 100%; }
+	.mbd-table tr {
+		padding: 10px 12px;
+		border-bottom: 1px solid var(--mbd-border);
+	}
+	.mbd-table td {
+		display: grid;
+		grid-template-columns: 120px minmax(0, 1fr);
+		gap: 10px;
+		padding: 8px 0;
+		white-space: normal;
+		border-bottom: 0;
+	}
+	.mbd-table td::before {
+		content: attr(data-label);
+		font-size: 12px;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		color: var(--mbd-muted);
+		font-weight: 600;
+	}
+	.mbd-table__actions { display: flex !important; gap: 12px; }
+	.mbd-table__actions::before { align-self: center; }
+}
+
 
 /* Forms */
 .mbd-form { max-width: 760px; }

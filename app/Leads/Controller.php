@@ -130,7 +130,7 @@ class Controller {
 			}
 
 			$id = $this->repo->create( $data, get_current_user_id() );
-			$this->redirect( add_query_arg( 'created', '1', Router::screen_url( 'leads' ) . '?lead=' . $id ) );
+			$this->redirect( add_query_arg( array( 'created' => '1', 'created_lead' => $id ), Router::screen_url( 'leads' ) ) );
 		}
 
 		if ( 'update' === $action ) {
@@ -280,7 +280,8 @@ class Controller {
 				'can_create' => Permissions::can_create(),
 				'scope'      => $scope,
 				'notice'     => $this->flash_notice(),
-				'new_url'    => Router::screen_url( 'leads' ) . '?action=new',
+				'new_url'      => Router::screen_url( 'leads' ) . '?action=new',
+				'highlight_id' => isset( $_GET['created_lead'] ) ? absint( wp_unslash( $_GET['created_lead'] ) ) : 0,
 			)
 		);
 	}
