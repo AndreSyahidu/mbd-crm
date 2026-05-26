@@ -137,6 +137,13 @@ class Plugin {
 	private \MBD\CRM\Offers\Module $offers;
 
 	/**
+	 * Reporting & analytics module.
+	 *
+	 * @var \MBD\CRM\Reporting\Module
+	 */
+	private \MBD\CRM\Reporting\Module $reporting;
+
+	/**
 	 * Import / Export module.
 	 *
 	 * @var \MBD\CRM\IO\Module
@@ -164,6 +171,7 @@ class Plugin {
 		$this->duplicates    = new \MBD\CRM\Duplicates\Module();
 		$this->scoring       = new \MBD\CRM\Scoring\Module();
 		$this->offers        = new \MBD\CRM\Offers\Module();
+		$this->reporting     = new \MBD\CRM\Reporting\Module();
 		$this->io            = new \MBD\CRM\IO\Module();
 	}
 
@@ -199,6 +207,7 @@ class Plugin {
 		$this->duplicates->register();
 		$this->scoring->register();
 		$this->offers->register();
+		$this->reporting->register();
 		$this->io->register();
 	}
 
