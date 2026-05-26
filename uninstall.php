@@ -44,6 +44,7 @@ function mbd_crm_uninstall() {
 		'mbd_crm_leads',
 		'mbd_crm_tasks',
 		'mbd_crm_audit',
+		'mbd_crm_stage_history',
 		'mbd_crm_qualifications',
 		'mbd_crm_followups',
 		'mbd_crm_promises',

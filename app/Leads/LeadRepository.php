@@ -162,9 +162,12 @@ class LeadRepository {
 		$row['created_by']     = $user_id;
 		$row['created_at']     = $now;
 		$row['updated_at']     = $now;
-		$row['sla_started_at'] = $now;
-		$row['sla_due_at']     = Sla::compute_due( $now );
-		$row['sla_status']     = 'running';
+		$row['sla_started_at']        = $now;
+		$row['sla_due_at']            = Sla::compute_due( $now );
+		$row['sla_status']            = 'running';
+		$row['stage']                 = 'new';
+		$row['last_stage_changed_at'] = $now;
+		$row['lifecycle']             = 'active';
 
 		$wpdb->insert( Schema::leads_table(), $row, $this->formats_for( array_keys( $row ) ) );
 
@@ -233,8 +236,219 @@ class LeadRepository {
 		 */
 		do_action( 'mbd_crm_lead_updated', $id, $changes );
 
+		$this->sync_stage( $id );
+
 		return true;
 	}
+
+	/**
+	 * Recompute the lead's derived stage. When it changes, reset the aging
+	 * clock, clear any stale flag, and append a stage-history entry.
+	 *
+	 * @param int    $id     Lead ID.
+	 * @param string $reason Optional reason for the transition.
+	 * @return void
+	 */
+	public function sync_stage( int $id, string $reason = '' ): void {
+		global $wpdb;
+
+		$lead = $this->find( $id );
+		if ( ! $lead ) {
+			return;
+		}
+
+		$new = Stage::key( $lead );
+		$old = (string) ( $lead->stage ?? '' );
+		if ( $new === $old ) {
+			return;
+		}
+
+		$wpdb->update(
+			Schema::leads_table(),
+			array(
+				'stage'                 => $new,
+				'last_stage_changed_at' => current_time( 'mysql' ),
+				'stale_flag'            => 0,
+				'stale_reason'          => '',
+				'stale_since'           => null,
+				'updated_at'            => current_time( 'mysql' ),
+			),
+			array( 'id' => $id ),
+			array( '%s', '%s', '%d', '%s', '%s', '%s' ),
+			array( '%d' )
+		);
+
+		$this->record_stage_history( $id, $old, $new, $reason );
+	}
+
+	/**
+	 * Append a stage-history row.
+	 *
+	 * @param int                  $lead_id Lead ID.
+	 * @param string               $from    Previous stage.
+	 * @param string               $to      New stage.
+	 * @param string               $reason  Optional reason.
+	 * @param array<string, mixed> $meta    Optional metadata.
+	 * @return void
+	 */
+	public function record_stage_history( int $lead_id, string $from, string $to, string $reason = '', array $meta = array() ): void {
+		global $wpdb;
+
+		$wpdb->insert(
+			Schema::stage_history_table(),
+			array(
+				'lead_id'       => $lead_id,
+				'from_status'   => $from,
+				'to_status'     => $to,
+				'changed_by'    => get_current_user_id(),
+				'changed_at'    => current_time( 'mysql' ),
+				'reason'        => $reason,
+				'metadata_json' => (string) wp_json_encode( $meta ),
+			),
+			array( '%d', '%s', '%s', '%d', '%s', '%s', '%s' )
+		);
+	}
+
+	/**
+	 * Stage history for a lead, newest first.
+	 *
+	 * @param int $lead_id Lead ID.
+	 * @return array<int, object>
+	 */
+	public function stage_history( int $lead_id ): array {
+		global $wpdb;
+
+		$table = Schema::stage_history_table();
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} WHERE lead_id = %d ORDER BY id DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$lead_id
+			)
+		);
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Set a lead's lifecycle (active / on_hold / archived / merged) and
+	 * optional related fields, then re-sync the derived stage.
+	 *
+	 * @param int                  $id        Lead ID.
+	 * @param string               $lifecycle Lifecycle value.
+	 * @param array<string, mixed> $extra     Extra columns to set.
+	 * @param string               $reason    Stage-history reason.
+	 * @return void
+	 */
+	public function set_lifecycle( int $id, string $lifecycle, array $extra = array(), string $reason = '' ): void {
+		global $wpdb;
+
+		$data   = array( 'lifecycle' => $lifecycle, 'updated_at' => current_time( 'mysql' ) );
+		$format = array( '%s', '%s' );
+
+		$allowed = array(
+			'reactivation_at'     => '%s',
+			'reactivation_reason' => '%s',
+			'closing_status'      => '%s',
+			'stale_flag'          => '%d',
+			'stale_reason'        => '%s',
+			'stale_since'         => '%s',
+		);
+		foreach ( $extra as $key => $value ) {
+			if ( isset( $allowed[ $key ] ) ) {
+				$data[ $key ] = $value;
+				$format[]     = $allowed[ $key ];
+			}
+		}
+
+		$wpdb->update( Schema::leads_table(), $data, array( 'id' => $id ), $format, array( '%d' ) );
+
+		$this->sync_stage( $id, $reason );
+	}
+
+	/**
+	 * Mark a lead stale (idempotent: keeps the original stale_since).
+	 *
+	 * @param object $lead   Lead row.
+	 * @param string $reason Stale reason.
+	 * @return void
+	 */
+	public function flag_stale( object $lead, string $reason ): void {
+		global $wpdb;
+
+		$data = array(
+			'stale_flag'   => 1,
+			'stale_reason' => $reason,
+			'updated_at'   => current_time( 'mysql' ),
+		);
+		$format = array( '%d', '%s', '%s' );
+
+		if ( empty( $lead->stale_since ) ) {
+			$data['stale_since'] = current_time( 'mysql' );
+			$format[]            = '%s';
+		}
+
+		$wpdb->update( Schema::leads_table(), $data, array( 'id' => (int) $lead->id ), $format, array( '%d' ) );
+	}
+
+	/**
+	 * Clear a lead's stale flag.
+	 *
+	 * @param int $id Lead ID.
+	 * @return void
+	 */
+	public function clear_stale( int $id ): void {
+		global $wpdb;
+
+		$wpdb->update(
+			Schema::leads_table(),
+			array(
+				'stale_flag'   => 0,
+				'stale_reason' => '',
+				'stale_since'  => null,
+				'updated_at'   => current_time( 'mysql' ),
+			),
+			array( 'id' => $id ),
+			array( '%d', '%s', '%s', '%s' ),
+			array( '%d' )
+		);
+	}
+
+	/**
+	 * Active pipeline leads (lifecycle active, not in a terminal stage),
+	 * optionally scoped to the current user.
+	 *
+	 * @param array{scope?: string, user_id?: int} $args Query args.
+	 * @return array<int, object>
+	 */
+	public function active_pipeline( array $args = array() ): array {
+		global $wpdb;
+
+		$table   = Schema::leads_table();
+		$scope   = $args['scope'] ?? 'all';
+		$user_id = (int) ( $args['user_id'] ?? 0 );
+
+		$where = "lifecycle = 'active' AND stage NOT IN ( 'closing_approved', 'closing_failed' )";
+
+		if ( 'own' === $scope ) {
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$table} WHERE {$where} AND ( assigned_to = %d OR created_by = %d ) ORDER BY last_stage_changed_at ASC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$user_id,
+					$user_id
+				)
+			);
+		} else {
+			$rows = $wpdb->get_results(
+				"SELECT * FROM {$table} WHERE {$where} ORDER BY last_stage_changed_at ASC" // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			);
+		}
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Set a lead's qualification status (written by the Qualification module).
 
 	/**
 	 * Update the lead's "next action" and "next follow-up" surface fields
@@ -354,6 +568,8 @@ class LeadRepository {
 		$format[]           = '%s';
 
 		$wpdb->update( Schema::leads_table(), $data, array( 'id' => $id ), $format, array( '%d' ) );
+
+		$this->sync_stage( $id );
 	}
 
 	/**
@@ -376,6 +592,8 @@ class LeadRepository {
 			array( '%s', '%s' ),
 			array( '%d' )
 		);
+
+		$this->sync_stage( $id );
 	}
 
 	/**

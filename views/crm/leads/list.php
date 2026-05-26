@@ -16,6 +16,7 @@ use MBD\CRM\Frontend\Components;
 use MBD\CRM\Leads\Options;
 use MBD\CRM\Leads\Permissions;
 use MBD\CRM\Leads\Sla;
+use MBD\CRM\Leads\Stage;
 use MBD\CRM\Router;
 
 defined( 'ABSPATH' ) || exit;
@@ -57,6 +58,7 @@ defined( 'ABSPATH' ) || exit;
 						<th><?php esc_html_e( 'Lead', 'mbd-crm' ); ?></th>
 						<th><?php esc_html_e( 'Status', 'mbd-crm' ); ?></th>
 						<th><?php esc_html_e( 'Quality', 'mbd-crm' ); ?></th>
+						<th><?php esc_html_e( 'Stage age', 'mbd-crm' ); ?></th>
 						<th><?php esc_html_e( 'Assigned', 'mbd-crm' ); ?></th>
 						<th><?php esc_html_e( 'Next follow-up', 'mbd-crm' ); ?></th>
 						<th><?php esc_html_e( 'SLA', 'mbd-crm' ); ?></th>
@@ -68,8 +70,9 @@ defined( 'ABSPATH' ) || exit;
 					foreach ( $leads as $lead ) :
 						$view_url = Router::screen_url( 'leads' ) . '?lead=' . (int) $lead->id;
 						$edit_url = Router::screen_url( 'leads' ) . '?action=edit&lead=' . (int) $lead->id;
-						$sla      = Sla::display( $lead );
-						$assignee = $names[ (int) $lead->assigned_to ] ?? __( 'Unassigned', 'mbd-crm' );
+						$sla       = Sla::display( $lead );
+						$assignee  = $names[ (int) $lead->assigned_to ] ?? __( 'Unassigned', 'mbd-crm' );
+						$mbd_stale = Stage::staleness( $lead );
 						?>
 						<tr>
 							<td>
@@ -79,6 +82,7 @@ defined( 'ABSPATH' ) || exit;
 							</td>
 							<td><?php echo Components::chip( Options::label( 'statuses', $lead->status ), Options::status_variant( $lead->status ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
 							<td><?php echo Components::chip( $lead->quality, Options::quality_variant( $lead->quality ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+							<td title="<?php echo esc_attr( $mbd_stale['stale'] ? $mbd_stale['reason'] : '' ); ?>"><?php echo Components::chip( Stage::aging_label( $lead ), $mbd_stale['stale'] ? 'danger' : 'muted' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
 							<td><?php echo esc_html( $assignee ); ?></td>
 							<td><?php echo esc_html( $lead->next_follow_up ? $lead->next_follow_up : '—' ); ?></td>
 							<td><?php echo Components::chip( $sla['label'], $sla['variant'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>

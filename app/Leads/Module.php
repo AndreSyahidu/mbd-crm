@@ -37,12 +37,28 @@ class Module {
 	private Tasks $tasks;
 
 	/**
+	 * Lifecycle (on-hold / archive / reactivate) handler.
+	 *
+	 * @var Lifecycle
+	 */
+	private Lifecycle $lifecycle;
+
+	/**
+	 * Stage-aging sweep and stuck-lead widget.
+	 *
+	 * @var Aging
+	 */
+	private Aging $aging;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->controller = new Controller();
 		$this->audit      = new Audit();
 		$this->tasks      = new Tasks();
+		$this->lifecycle  = new Lifecycle();
+		$this->aging      = new Aging();
 	}
 
 	/**
@@ -53,6 +69,8 @@ class Module {
 	public function register(): void {
 		$this->audit->register();
 		$this->tasks->register();
+		$this->lifecycle->register();
+		$this->aging->register();
 
 		add_filter( 'mbd_crm_screen_content', array( $this->controller, 'maybe_render' ), 10, 3 );
 	}

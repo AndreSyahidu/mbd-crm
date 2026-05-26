@@ -89,13 +89,38 @@ class Schema {
 			deposit_override tinyint(1) NOT NULL DEFAULT 0,
 			planning_approved tinyint(1) NOT NULL DEFAULT 0,
 			closing_status varchar(12) NOT NULL DEFAULT '',
+			stage varchar(40) NOT NULL DEFAULT 'new',
+			last_stage_changed_at datetime DEFAULT NULL,
+			lifecycle varchar(12) NOT NULL DEFAULT 'active',
+			stale_flag tinyint(1) NOT NULL DEFAULT 0,
+			stale_reason varchar(255) NOT NULL DEFAULT '',
+			stale_since datetime DEFAULT NULL,
+			reactivation_at datetime DEFAULT NULL,
+			reactivation_reason varchar(255) NOT NULL DEFAULT '',
 			created_by bigint(20) unsigned NOT NULL DEFAULT 0,
 			created_at datetime DEFAULT NULL,
 			updated_at datetime DEFAULT NULL,
 			PRIMARY KEY  (id),
 			KEY assigned_to (assigned_to),
 			KEY created_by (created_by),
-			KEY status (status)
+			KEY status (status),
+			KEY stage (stage),
+			KEY lifecycle (lifecycle),
+			KEY stale_flag (stale_flag)
+		) {$charset_collate};";
+
+		$stage_history = self::stage_history_table();
+		$sql[]         = "CREATE TABLE {$stage_history} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			lead_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			from_status varchar(40) NOT NULL DEFAULT '',
+			to_status varchar(40) NOT NULL DEFAULT '',
+			changed_by bigint(20) unsigned NOT NULL DEFAULT 0,
+			changed_at datetime DEFAULT NULL,
+			reason varchar(255) NOT NULL DEFAULT '',
+			metadata_json longtext NOT NULL,
+			PRIMARY KEY  (id),
+			KEY lead_id (lead_id)
 		) {$charset_collate};";
 
 		$sql[] = "CREATE TABLE {$tasks} (
@@ -136,9 +161,20 @@ class Schema {
 	public static function drop_tables(): void {
 		global $wpdb;
 
-		foreach ( array( self::leads_table(), self::tasks_table(), self::audit_table() ) as $table ) {
+		foreach ( array( self::leads_table(), self::tasks_table(), self::audit_table(), self::stage_history_table() ) as $table ) {
 			// Table names are built from a trusted prefix, not user input.
 			$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery
 		}
+	}
+
+	/**
+	 * Fully-qualified stage-history table name.
+	 *
+	 * @return string
+	 */
+	public static function stage_history_table(): string {
+		global $wpdb;
+
+		return $wpdb->prefix . 'mbd_crm_stage_history';
 	}
 }

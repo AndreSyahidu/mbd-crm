@@ -28,6 +28,7 @@ class Audit {
 	public const PLANNING       = 'lead.planning';
 	public const APPROVAL       = 'lead.planning_approval';
 	public const CLOSING        = 'lead.closing';
+	public const LIFECYCLE      = 'lead.lifecycle';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -235,6 +236,14 @@ class Audit {
 					? sprintf( __( 'Closing %1$s: %2$s', 'mbd-crm' ), $cevent, $creason )
 					/* translators: %s: closing event. */
 					: sprintf( __( 'Closing %s', 'mbd-crm' ), $cevent );
+			case self::LIFECYCLE:
+				$levent  = (string) ( $detail['event'] ?? '' );
+				$lreason = (string) ( $detail['reason'] ?? '' );
+				return '' !== $lreason
+					/* translators: 1: lifecycle event, 2: reason. */
+					? sprintf( __( 'Lead %1$s: %2$s', 'mbd-crm' ), $levent, $lreason )
+					/* translators: %s: lifecycle event. */
+					: sprintf( __( 'Lead %s', 'mbd-crm' ), $levent );
 		}
 
 		return $entry->action;
