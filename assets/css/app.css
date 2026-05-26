@@ -1,0 +1,11 @@
+/* MBD CRM front-end styles. */
+.mbd-crm-app {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.mbd-crm-app__main {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 2rem 1rem;
+}
