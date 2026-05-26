@@ -93,6 +93,27 @@ class DiscoveryRepository {
 	}
 
 	/**
+	 * Discoveries in a given status.
+	 *
+	 * @param string $status Status key.
+	 * @return array<int, object>
+	 */
+	public function by_status( string $status ): array {
+		global $wpdb;
+
+		$table = Schema::table();
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} WHERE status = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$status
+			)
+		);
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
 	 * Reschedule a discovery.
 	 *
 	 * @param int    $id           Discovery ID.

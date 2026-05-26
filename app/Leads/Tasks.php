@@ -78,6 +78,29 @@ class Tasks {
 	}
 
 	/**
+	 * Open tasks assigned to a user, newest first.
+	 *
+	 * @param int $user_id User ID.
+	 * @param int $limit   Maximum rows.
+	 * @return array<int, object>
+	 */
+	public static function open_for_user( int $user_id, int $limit = 50 ): array {
+		global $wpdb;
+
+		$table = Schema::tasks_table();
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} WHERE assigned_to = %d AND status = 'open' ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$user_id,
+				$limit
+			)
+		);
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
 	 * Tasks attached to a lead, newest first.
 	 *
 	 * @param int $lead_id Lead ID.

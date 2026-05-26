@@ -102,6 +102,13 @@ class Plugin {
 	private \MBD\CRM\Closing\Module $closing;
 
 	/**
+	 * Dashboard and KPI module.
+	 *
+	 * @var \MBD\CRM\Dashboard\Module
+	 */
+	private \MBD\CRM\Dashboard\Module $dashboard;
+
+	/**
 	 * Build the component graph.
 	 */
 	public function __construct() {
@@ -117,6 +124,7 @@ class Plugin {
 		$this->planning      = new \MBD\CRM\Planning\Module();
 		$this->approval      = new \MBD\CRM\Approval\Module();
 		$this->closing       = new \MBD\CRM\Closing\Module();
+		$this->dashboard     = new \MBD\CRM\Dashboard\Module();
 	}
 
 	/**
@@ -142,6 +150,7 @@ class Plugin {
 		$this->planning->register();
 		$this->approval->register();
 		$this->closing->register();
+		$this->dashboard->register();
 	}
 
 	/**
