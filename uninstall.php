@@ -39,13 +39,28 @@ function mbd_crm_uninstall() {
 
 	// Drop the Lead Intake module tables. Names are built from the trusted
 	// table prefix, not user input.
-	foreach ( array( 'mbd_crm_leads', 'mbd_crm_tasks', 'mbd_crm_audit', 'mbd_crm_qualifications', 'mbd_crm_followups', 'mbd_crm_promises', 'mbd_crm_discoveries' ) as $mbd_crm_table ) {
+	$mbd_crm_tables = array(
+		'mbd_crm_leads',
+		'mbd_crm_tasks',
+		'mbd_crm_audit',
+		'mbd_crm_qualifications',
+		'mbd_crm_followups',
+		'mbd_crm_promises',
+		'mbd_crm_discoveries',
+		'mbd_crm_deposits',
+		'mbd_crm_plannings',
+		'mbd_crm_deliverables',
+		'mbd_crm_revisions',
+		'mbd_crm_approvals',
+		'mbd_crm_closings',
+	);
+	foreach ( $mbd_crm_tables as $mbd_crm_table ) {
 		$table = $wpdb->prefix . $mbd_crm_table;
 		$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery
 	}
 
 	// Remove the CRM roles created on activation.
-	foreach ( array( 'mbd_crm_owner', 'mbd_crm_sales', 'mbd_crm_viewer' ) as $mbd_crm_role ) {
+	foreach ( array( 'mbd_crm_owner', 'mbd_crm_sales', 'mbd_crm_viewer', 'mbd_crm_finance' ) as $mbd_crm_role ) {
 		remove_role( $mbd_crm_role );
 	}
 
@@ -59,6 +74,9 @@ function mbd_crm_uninstall() {
 			'mbd_crm_edit_others_leads',
 			'mbd_crm_view_all_leads',
 			'mbd_crm_assign_leads',
+			'mbd_crm_verify_deposits',
+			'mbd_crm_override_deposit',
+			'mbd_crm_approve_closing',
 		);
 		foreach ( $mbd_crm_caps as $mbd_crm_cap ) {
 			$mbd_crm_admin->remove_cap( $mbd_crm_cap );

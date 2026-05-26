@@ -1,10 +1,10 @@
 <?php
 /**
- * Notifications screen: due promises.
+ * Notifications screen.
  *
  * @package MBD\CRM
  *
- * @var array<int, array{lead:string,description:string,due:string,overdue:bool,url:string}> $rows Due promises.
+ * @var array<int, array{icon:string,title:string,meta:string,chip:string,variant:string,url:string}> $items Notification items.
  */
 
 use MBD\CRM\Frontend\Components;
@@ -12,47 +12,28 @@ use MBD\CRM\Frontend\Components;
 defined( 'ABSPATH' ) || exit;
 ?>
 <div class="mbd-page">
-	<p class="mbd-page__lead"><?php esc_html_e( 'Promises that are due or overdue and still open.', 'mbd-crm' ); ?></p>
+	<p class="mbd-page__lead"><?php esc_html_e( 'Alerts that need your attention.', 'mbd-crm' ); ?></p>
 
-	<?php if ( empty( $rows ) ) : ?>
+	<?php if ( empty( $items ) ) : ?>
 		<?php
 		echo Components::empty_state( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			__( 'You are all caught up', 'mbd-crm' ),
-			__( 'Due promises will appear here so nothing slips.', 'mbd-crm' ),
+			__( 'Due promises, deposit reviews, and approvals will appear here.', 'mbd-crm' ),
 			'dashicons-bell'
 		);
 		?>
 	<?php else : ?>
-		<div class="mbd-table-wrap">
-			<table class="mbd-table">
-				<thead>
-					<tr>
-						<th><?php esc_html_e( 'Lead', 'mbd-crm' ); ?></th>
-						<th><?php esc_html_e( 'Promise', 'mbd-crm' ); ?></th>
-						<th><?php esc_html_e( 'Due', 'mbd-crm' ); ?></th>
-						<th class="mbd-table__actions"><?php esc_html_e( 'Actions', 'mbd-crm' ); ?></th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php foreach ( $rows as $row ) : ?>
-						<tr>
-							<td><a class="mbd-table__primary" href="<?php echo esc_url( $row['url'] ); ?>"><?php echo esc_html( $row['lead'] ); ?></a></td>
-							<td><?php echo esc_html( $row['description'] ); ?></td>
-							<td>
-								<?php
-								echo Components::chip( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-									$row['due'],
-									$row['overdue'] ? 'danger' : 'warning'
-								);
-								?>
-							</td>
-							<td class="mbd-table__actions">
-								<a href="<?php echo esc_url( $row['url'] ); ?>"><?php esc_html_e( 'Open', 'mbd-crm' ); ?></a>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-				</tbody>
-			</table>
-		</div>
+		<ul class="mbd-notif-list">
+			<?php foreach ( $items as $item ) : ?>
+				<li class="mbd-notif">
+					<span class="mbd-notif__icon dashicons <?php echo esc_attr( $item['icon'] ); ?>" aria-hidden="true"></span>
+					<div class="mbd-notif__body">
+						<a class="mbd-table__primary" href="<?php echo esc_url( $item['url'] ); ?>"><?php echo esc_html( $item['title'] ); ?></a>
+						<span class="mbd-timeline__meta"><?php echo esc_html( $item['meta'] ); ?></span>
+					</div>
+					<?php echo Components::chip( $item['chip'], $item['variant'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</li>
+			<?php endforeach; ?>
+		</ul>
 	<?php endif; ?>
 </div>

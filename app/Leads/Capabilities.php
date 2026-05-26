@@ -21,6 +21,9 @@ class Capabilities {
 	public const EDIT_OTHERS_LEADS  = 'mbd_crm_edit_others_leads';
 	public const VIEW_ALL_LEADS     = 'mbd_crm_view_all_leads';
 	public const ASSIGN_LEADS       = 'mbd_crm_assign_leads';
+	public const VERIFY_DEPOSITS    = 'mbd_crm_verify_deposits';
+	public const OVERRIDE_DEPOSIT   = 'mbd_crm_override_deposit';
+	public const APPROVE_CLOSING    = 'mbd_crm_approve_closing';
 
 	/**
 	 * Every lead capability.
@@ -35,6 +38,9 @@ class Capabilities {
 			self::EDIT_OTHERS_LEADS,
 			self::VIEW_ALL_LEADS,
 			self::ASSIGN_LEADS,
+			self::VERIFY_DEPOSITS,
+			self::OVERRIDE_DEPOSIT,
+			self::APPROVE_CLOSING,
 		);
 	}
 
@@ -61,18 +67,28 @@ class Capabilities {
 			self::VIEW_ALL_LEADS => true,
 		);
 
+		$finance = array(
+			self::ACCESS_LEADS    => true,
+			self::VIEW_ALL_LEADS  => true,
+			self::VERIFY_DEPOSITS => true,
+		);
+
 		return array(
-			'mbd_crm_owner'  => array(
+			'mbd_crm_owner'   => array(
 				'name' => __( 'CRM Owner', 'mbd-crm' ),
 				'caps' => array_merge( array( 'read' => true ), $owner ),
 			),
-			'mbd_crm_sales'  => array(
+			'mbd_crm_sales'   => array(
 				'name' => __( 'CRM Sales', 'mbd-crm' ),
 				'caps' => array_merge( array( 'read' => true ), $sales ),
 			),
-			'mbd_crm_viewer' => array(
+			'mbd_crm_viewer'  => array(
 				'name' => __( 'CRM Viewer', 'mbd-crm' ),
 				'caps' => array_merge( array( 'read' => true ), $viewer ),
+			),
+			'mbd_crm_finance' => array(
+				'name' => __( 'CRM Finance', 'mbd-crm' ),
+				'caps' => array_merge( array( 'read' => true ), $finance ),
 			),
 		);
 	}

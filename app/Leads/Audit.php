@@ -24,6 +24,7 @@ class Audit {
 	public const PROMISE_MADE   = 'lead.promise_created';
 	public const PROMISE_STATUS = 'lead.promise_status_changed';
 	public const DISCOVERY      = 'lead.discovery';
+	public const DEPOSIT        = 'lead.deposit';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -189,6 +190,14 @@ class Audit {
 					(string) ( $detail['event'] ?? '' ),
 					(string) ( $detail['type'] ?? '' )
 				);
+			case self::DEPOSIT:
+				$event   = (string) ( $detail['event'] ?? '' );
+				$dreason = (string) ( $detail['reason'] ?? '' );
+				return '' !== $dreason
+					/* translators: 1: deposit event, 2: reason. */
+					? sprintf( __( 'Deposit %1$s: %2$s', 'mbd-crm' ), $event, $dreason )
+					/* translators: %s: deposit event. */
+					: sprintf( __( 'Deposit %s', 'mbd-crm' ), $event );
 		}
 
 		return $entry->action;

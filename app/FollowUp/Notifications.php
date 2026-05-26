@@ -1,6 +1,6 @@
 <?php
 /**
- * Notifications screen: due promises.
+ * Notifications screen: aggregated alerts from every module.
  *
  * @package MBD\CRM
  */
@@ -15,8 +15,8 @@ use MBD\CRM\View;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Surfaces open promises that are due (or overdue) on the Notifications
- * screen for leads the current user may view.
+ * Renders the Notifications screen by collecting items from the
+ * `mbd_crm_notifications` filter, and contributes due-promise items.
  */
 class Notifications {
 
@@ -51,6 +51,16 @@ class Notifications {
 	}
 
 	/**
+	 * Register the screen handler and the promise provider.
+	 *
+	 * @return void
+	 */
+	public function register(): void {
+		add_filter( 'mbd_crm_screen_content', array( $this, 'maybe_render' ), 10, 3 );
+		add_filter( 'mbd_crm_notifications', array( $this, 'promise_items' ) );
+	}
+
+	/**
 	 * Provide the notifications screen content.
 	 *
 	 * @param string|null $content Existing content.
@@ -65,25 +75,42 @@ class Notifications {
 			return $content;
 		}
 
-		$today    = current_time( 'Y-m-d' );
-		$due       = $this->promises->due( $today );
-		$rows      = array();
+		/**
+		 * Collect notification items for the current user.
+		 *
+		 * @param array<int, array<string, mixed>> $items Notification items.
+		 */
+		$items = apply_filters( 'mbd_crm_notifications', array() );
 
-		foreach ( $due as $promise ) {
+		return $this->view->capture( 'crm/notifications/index', array( 'items' => $items ) );
+	}
+
+	/**
+	 * Contribute due / overdue open promise items.
+	 *
+	 * @param array<int, array<string, mixed>> $items Existing items.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function promise_items( array $items ): array {
+		$today = current_time( 'Y-m-d' );
+
+		foreach ( $this->promises->due( $today ) as $promise ) {
 			$lead = $this->leads->find( (int) $promise->lead_id );
 			if ( ! $lead || ! Permissions::can_view( $lead ) ) {
 				continue;
 			}
 
-			$rows[] = array(
-				'lead'        => '' !== $lead->name ? $lead->name : __( '(no name)', 'mbd-crm' ),
-				'description' => (string) $promise->description,
-				'due'         => (string) $promise->due_date,
-				'overdue'     => $promise->due_date < $today,
-				'url'         => Router::screen_url( 'leads' ) . '?lead=' . (int) $lead->id,
+			$overdue  = $promise->due_date < $today;
+			$items[] = array(
+				'icon'    => 'dashicons-clipboard',
+				'title'   => '' !== $lead->name ? $lead->name : __( '(no name)', 'mbd-crm' ),
+				'meta'    => (string) $promise->description,
+				'chip'    => sprintf( /* translators: %s: due date. */ __( 'Promise due %s', 'mbd-crm' ), (string) $promise->due_date ),
+				'variant' => $overdue ? 'danger' : 'warning',
+				'url'     => Router::screen_url( 'leads' ) . '?lead=' . (int) $lead->id,
 			);
 		}
 
-		return $this->view->capture( 'crm/notifications/index', array( 'rows' => $rows ) );
+		return $items;
 	}
 }

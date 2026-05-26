@@ -420,3 +420,9 @@ html, body.mbd-crm {
 .mbd-disc:last-child { border-bottom: 0; }
 .mbd-disc__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .mbd-disc__field { margin: 6px 0 0; font-size: 13px; }
+
+/* Notifications list */
+.mbd-notif-list { list-style: none; margin: 0; padding: 0; }
+.mbd-notif { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--mbd-surface); border: 1px solid var(--mbd-border); border-radius: var(--mbd-radius); margin-bottom: 10px; box-shadow: var(--mbd-shadow); }
+.mbd-notif__icon { color: var(--mbd-muted); }
+.mbd-notif__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }

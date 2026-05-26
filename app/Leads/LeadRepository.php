@@ -296,6 +296,43 @@ class LeadRepository {
 	}
 
 	/**
+	 * Update one or more pipeline stage flags on a lead. Only the
+	 * allowlisted stage columns may be written through this method.
+	 *
+	 * @param int                  $id     Lead ID.
+	 * @param array<string, mixed> $fields Column => value.
+	 * @return void
+	 */
+	public function set_stage( int $id, array $fields ): void {
+		global $wpdb;
+
+		$allowed = array(
+			'deposit_status'    => '%s',
+			'deposit_override'  => '%d',
+			'planning_approved' => '%d',
+			'closing_status'    => '%s',
+		);
+
+		$data   = array();
+		$format = array();
+		foreach ( $fields as $key => $value ) {
+			if ( isset( $allowed[ $key ] ) ) {
+				$data[ $key ] = $value;
+				$format[]     = $allowed[ $key ];
+			}
+		}
+
+		if ( empty( $data ) ) {
+			return;
+		}
+
+		$data['updated_at'] = current_time( 'mysql' );
+		$format[]           = '%s';
+
+		$wpdb->update( Schema::leads_table(), $data, array( 'id' => $id ), $format, array( '%d' ) );
+	}
+
+	/**
 	 * Set a lead's qualification status (written by the Qualification module).
 	 *
 	 * @param int    $id     Lead ID.

@@ -1,43 +1,36 @@
 <?php
 /**
- * Follow-Up & Promise Tracking module bootstrap.
+ * Deposit Planning module bootstrap.
  *
  * @package MBD\CRM
  */
 
-namespace MBD\CRM\FollowUp;
+namespace MBD\CRM\Deposit;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Wires follow-up/promise request handling, the detail panel, automation,
- * the dashboard widget, and the notifications screen into the CRM.
+ * Wires deposit request handling, the detail panel, automation, and the
+ * deposit notification provider.
  */
 class Module {
 
 	/**
-	 * Follow-up / promise handler and panel renderer.
+	 * Deposit handler and panel renderer.
 	 *
 	 * @var Controller
 	 */
 	private Controller $controller;
 
 	/**
-	 * Task and audit automation.
+	 * Deposit audit automation.
 	 *
 	 * @var Automation
 	 */
 	private Automation $automation;
 
 	/**
-	 * Overdue follow-ups dashboard widget.
-	 *
-	 * @var Dashboard
-	 */
-	private Dashboard $dashboard;
-
-	/**
-	 * Due-promise notifications.
+	 * Deposit notification provider.
 	 *
 	 * @var Notifications
 	 */
@@ -49,7 +42,6 @@ class Module {
 	public function __construct() {
 		$this->controller    = new Controller();
 		$this->automation    = new Automation();
-		$this->dashboard     = new Dashboard();
 		$this->notifications = new Notifications();
 	}
 
@@ -60,28 +52,27 @@ class Module {
 	 */
 	public function register(): void {
 		$this->automation->register();
-		$this->dashboard->register();
 		$this->notifications->register();
 
 		add_filter( 'mbd_crm_leads_post_action', array( $this->controller, 'handle' ), 10, 2 );
-		add_filter( 'mbd_crm_lead_detail_panels', array( $this->controller, 'render_panel' ), 20, 2 );
+		add_filter( 'mbd_crm_lead_detail_panels', array( $this->controller, 'render_panel' ), 40, 2 );
 	}
 
 	/**
-	 * Create the module's tables. Called from the plugin activator.
+	 * Create the module's table. Called from the plugin activator.
 	 *
 	 * @return void
 	 */
 	public static function install(): void {
-		Schema::create_tables();
+		Schema::create_table();
 	}
 
 	/**
-	 * Drop the module's tables. Called from the opt-in uninstall routine.
+	 * Drop the module's table. Called from the opt-in uninstall routine.
 	 *
 	 * @return void
 	 */
 	public static function uninstall(): void {
-		Schema::drop_tables();
+		Schema::drop_table();
 	}
 }

@@ -74,6 +74,13 @@ class Plugin {
 	private \MBD\CRM\Discovery\Module $discovery;
 
 	/**
+	 * Deposit Planning module.
+	 *
+	 * @var \MBD\CRM\Deposit\Module
+	 */
+	private \MBD\CRM\Deposit\Module $deposit;
+
+	/**
 	 * Build the component graph.
 	 */
 	public function __construct() {
@@ -85,6 +92,7 @@ class Plugin {
 		$this->qualification = new \MBD\CRM\Qualification\Module();
 		$this->followup      = new \MBD\CRM\FollowUp\Module();
 		$this->discovery     = new \MBD\CRM\Discovery\Module();
+		$this->deposit       = new \MBD\CRM\Deposit\Module();
 	}
 
 	/**
@@ -106,6 +114,7 @@ class Plugin {
 		$this->qualification->register();
 		$this->followup->register();
 		$this->discovery->register();
+		$this->deposit->register();
 	}
 
 	/**
