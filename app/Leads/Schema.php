@@ -68,9 +68,11 @@ class Schema {
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			name varchar(191) NOT NULL DEFAULT '',
 			whatsapp varchar(32) NOT NULL DEFAULT '',
+			whatsapp_normalized varchar(32) NOT NULL DEFAULT '',
 			source varchar(50) NOT NULL DEFAULT '',
 			project_type varchar(50) NOT NULL DEFAULT '',
 			service_type varchar(50) NOT NULL DEFAULT '',
+			project_location varchar(191) NOT NULL DEFAULT '',
 			estimated_budget decimal(15,2) DEFAULT NULL,
 			budget_unknown_reason varchar(191) NOT NULL DEFAULT '',
 			urgency varchar(20) NOT NULL DEFAULT '',
@@ -97,6 +99,7 @@ class Schema {
 			stale_since datetime DEFAULT NULL,
 			reactivation_at datetime DEFAULT NULL,
 			reactivation_reason varchar(255) NOT NULL DEFAULT '',
+			merged_into_lead_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			created_by bigint(20) unsigned NOT NULL DEFAULT 0,
 			created_at datetime DEFAULT NULL,
 			updated_at datetime DEFAULT NULL,
@@ -106,7 +109,8 @@ class Schema {
 			KEY status (status),
 			KEY stage (stage),
 			KEY lifecycle (lifecycle),
-			KEY stale_flag (stale_flag)
+			KEY stale_flag (stale_flag),
+			KEY whatsapp_normalized (whatsapp_normalized)
 		) {$charset_collate};";
 
 		$stage_history = self::stage_history_table();

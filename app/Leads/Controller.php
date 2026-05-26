@@ -179,6 +179,7 @@ class Controller {
 		$v['source']                = sanitize_key( $this->post_text( 'source' ) );
 		$v['project_type']          = sanitize_key( $this->post_text( 'project_type' ) );
 		$v['service_type']          = sanitize_key( $this->post_text( 'service_type' ) );
+		$v['project_location']      = $this->post_text( 'project_location' );
 		$v['urgency']               = sanitize_key( $this->post_text( 'urgency' ) );
 		$v['quality']               = sanitize_key( $this->post_text( 'quality' ) );
 		$v['status']                = sanitize_key( $this->post_text( 'status' ) );
@@ -360,6 +361,7 @@ class Controller {
 			'source'                => '',
 			'project_type'          => '',
 			'service_type'          => '',
+			'project_location'      => '',
 			'urgency'               => '',
 			'quality'               => 'unknown',
 			'status'                => 'new',

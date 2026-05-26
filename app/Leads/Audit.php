@@ -29,6 +29,8 @@ class Audit {
 	public const APPROVAL       = 'lead.planning_approval';
 	public const CLOSING        = 'lead.closing';
 	public const LIFECYCLE      = 'lead.lifecycle';
+	public const STAKEHOLDER    = 'lead.stakeholder';
+	public const MERGE          = 'lead.merge';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -244,6 +246,12 @@ class Audit {
 					? sprintf( __( 'Lead %1$s: %2$s', 'mbd-crm' ), $levent, $lreason )
 					/* translators: %s: lifecycle event. */
 					: sprintf( __( 'Lead %s', 'mbd-crm' ), $levent );
+			case self::STAKEHOLDER:
+				/* translators: 1: event, 2: stakeholder name. */
+				return sprintf( __( 'Stakeholder %1$s: %2$s', 'mbd-crm' ), (string) ( $detail['event'] ?? '' ), (string) ( $detail['name'] ?? '' ) );
+			case self::MERGE:
+				/* translators: 1: secondary lead id, 2: primary lead id. */
+				return sprintf( __( 'Merged lead #%1$d into #%2$d', 'mbd-crm' ), (int) ( $detail['from'] ?? 0 ), (int) ( $detail['into'] ?? 0 ) );
 		}
 
 		return $entry->action;

@@ -109,6 +109,20 @@ class Plugin {
 	private \MBD\CRM\Dashboard\Module $dashboard;
 
 	/**
+	 * Stakeholder mapping module.
+	 *
+	 * @var \MBD\CRM\Stakeholders\Module
+	 */
+	private \MBD\CRM\Stakeholders\Module $stakeholders;
+
+	/**
+	 * Duplicate detection & merge module.
+	 *
+	 * @var \MBD\CRM\Duplicates\Module
+	 */
+	private \MBD\CRM\Duplicates\Module $duplicates;
+
+	/**
 	 * Import / Export module.
 	 *
 	 * @var \MBD\CRM\IO\Module
@@ -132,6 +146,8 @@ class Plugin {
 		$this->approval      = new \MBD\CRM\Approval\Module();
 		$this->closing       = new \MBD\CRM\Closing\Module();
 		$this->dashboard     = new \MBD\CRM\Dashboard\Module();
+		$this->stakeholders  = new \MBD\CRM\Stakeholders\Module();
+		$this->duplicates    = new \MBD\CRM\Duplicates\Module();
 		$this->io            = new \MBD\CRM\IO\Module();
 	}
 
@@ -163,6 +179,8 @@ class Plugin {
 		$this->approval->register();
 		$this->closing->register();
 		$this->dashboard->register();
+		$this->stakeholders->register();
+		$this->duplicates->register();
 		$this->io->register();
 	}
 

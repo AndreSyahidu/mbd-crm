@@ -84,6 +84,11 @@ class Screens {
 				'icon'  => 'dashicons-list-view',
 				'cap'   => 'manage_options',
 			),
+			'duplicates'    => array(
+				'label' => __( 'Duplicates', 'mbd-crm' ),
+				'icon'  => 'dashicons-admin-page',
+				'cap'   => \MBD\CRM\Leads\Capabilities::MERGE_LEADS,
+			),
 		);
 
 		/**

@@ -88,6 +88,11 @@ $mbd_select = static function ( $name, $group, $current, $placeholder ) {
 			</div>
 		</div>
 
+		<div class="mbd-field">
+			<label for="mbd-project_location"><?php esc_html_e( 'Project location', 'mbd-crm' ); ?></label>
+			<input type="text" id="mbd-project_location" name="project_location" value="<?php echo esc_attr( $values['project_location'] ); ?>" />
+		</div>
+
 		<div class="mbd-field-row">
 			<div class="mbd-field">
 				<label for="mbd-estimated_budget"><?php esc_html_e( 'Estimated budget', 'mbd-crm' ); ?></label>

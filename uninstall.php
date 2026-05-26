@@ -37,6 +37,7 @@ function mbd_crm_uninstall() {
 
 	delete_option( MBD_CRM_UNINSTALL_OPTION );
 	delete_option( 'mbd_crm_master_options' );
+	delete_option( 'mbd_crm_db_version' );
 
 	// Drop the Lead Intake module tables. Names are built from the trusted
 	// table prefix, not user input.
@@ -55,6 +56,8 @@ function mbd_crm_uninstall() {
 		'mbd_crm_revisions',
 		'mbd_crm_approvals',
 		'mbd_crm_closings',
+		'mbd_crm_negotiations',
+		'mbd_crm_stakeholders',
 	);
 	foreach ( $mbd_crm_tables as $mbd_crm_table ) {
 		$table = $wpdb->prefix . $mbd_crm_table;
@@ -79,6 +82,7 @@ function mbd_crm_uninstall() {
 			'mbd_crm_verify_deposits',
 			'mbd_crm_override_deposit',
 			'mbd_crm_approve_closing',
+			'mbd_crm_merge_leads',
 		);
 		foreach ( $mbd_crm_caps as $mbd_crm_cap ) {
 			$mbd_crm_admin->remove_cap( $mbd_crm_cap );

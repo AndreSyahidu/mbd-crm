@@ -24,6 +24,7 @@ class LeadRepository {
 		'source',
 		'project_type',
 		'service_type',
+		'project_location',
 		'estimated_budget',
 		'budget_unknown_reason',
 		'urgency',
@@ -121,6 +122,76 @@ class LeadRepository {
 	}
 
 	/**
+	 * Normalise a phone/WhatsApp number to a comparable canonical form.
+	 *
+	 * Strips non-digits and maps a leading "0" to the Indonesian "62" country
+	 * code so 08xx, 62xx and +62 xx variants compare equal.
+	 *
+	 * @param string $raw Raw input.
+	 * @return string
+	 */
+	public static function normalize_phone( string $raw ): string {
+		$digits = preg_replace( '/\D+/', '', $raw );
+		if ( '' === $digits ) {
+			return '';
+		}
+		if ( 0 === strpos( $digits, '0' ) ) {
+			$digits = '62' . substr( $digits, 1 );
+		}
+
+		return $digits;
+	}
+
+	/**
+	 * Duplicate candidates for a lead: other non-merged leads matching by
+	 * normalized WhatsApp, or by name + project location.
+	 *
+	 * @param object $lead Lead row.
+	 * @return array<int, object> Each row gains a `match_reason` property.
+	 */
+	public function duplicate_candidates( object $lead ): array {
+		global $wpdb;
+
+		$table      = Schema::leads_table();
+		$id         = (int) $lead->id;
+		$normalized = self::normalize_phone( (string) ( $lead->whatsapp ?? '' ) );
+		$name       = (string) ( $lead->name ?? '' );
+		$location   = (string) ( $lead->project_location ?? '' );
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table}
+				WHERE id <> %d AND lifecycle <> 'merged'
+				AND (
+					( whatsapp_normalized <> '' AND whatsapp_normalized = %s )
+					OR ( name <> '' AND name = %s AND project_location <> '' AND project_location = %s )
+				)
+				ORDER BY id DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$id,
+				$normalized,
+				$name,
+				$location
+			)
+		);
+
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
+
+		foreach ( $rows as $row ) {
+			if ( '' !== $normalized && $normalized === self::normalize_phone( (string) $row->whatsapp ) ) {
+				$row->match_reason = ( (string) $row->whatsapp === (string) $lead->whatsapp )
+					? __( 'Exact WhatsApp match', 'mbd-crm' )
+					: __( 'Normalized WhatsApp match', 'mbd-crm' );
+			} else {
+				$row->match_reason = __( 'Same name + project location', 'mbd-crm' );
+			}
+		}
+
+		return $rows;
+	}
+
+	/**
 	 * Whether a lead already exists with the same WhatsApp number and name
 	 * (used for import de-duplication).
 	 *
@@ -168,6 +239,7 @@ class LeadRepository {
 		$row['stage']                 = 'new';
 		$row['last_stage_changed_at'] = $now;
 		$row['lifecycle']             = 'active';
+		$row['whatsapp_normalized']   = self::normalize_phone( (string) ( $row['whatsapp'] ?? '' ) );
 
 		$wpdb->insert( Schema::leads_table(), $row, $this->formats_for( array_keys( $row ) ) );
 
@@ -206,6 +278,9 @@ class LeadRepository {
 
 		$row               = $this->prepare_row( $data );
 		$row['updated_at'] = current_time( 'mysql' );
+		if ( array_key_exists( 'whatsapp', $row ) ) {
+			$row['whatsapp_normalized'] = self::normalize_phone( (string) $row['whatsapp'] );
+		}
 
 		$wpdb->update(
 			Schema::leads_table(),
@@ -412,6 +487,31 @@ class LeadRepository {
 			array( '%d', '%s', '%s', '%s' ),
 			array( '%d' )
 		);
+	}
+
+	/**
+	 * Mark a lead as merged into another and re-sync its stage.
+	 *
+	 * @param int $secondary_id Lead being merged away.
+	 * @param int $primary_id   Surviving lead.
+	 * @return void
+	 */
+	public function mark_merged( int $secondary_id, int $primary_id ): void {
+		global $wpdb;
+
+		$wpdb->update(
+			Schema::leads_table(),
+			array(
+				'lifecycle'           => 'merged',
+				'merged_into_lead_id' => $primary_id,
+				'updated_at'          => current_time( 'mysql' ),
+			),
+			array( 'id' => $secondary_id ),
+			array( '%s', '%d', '%s' ),
+			array( '%d' )
+		);
+
+		$this->sync_stage( $secondary_id, __( 'Merged', 'mbd-crm' ) );
 	}
 
 	/**
