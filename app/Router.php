@@ -136,8 +136,21 @@ class Router {
 			);
 		} else {
 			status_header( 200 );
-			$title   = $meta['label'];
-			$content = $view->capture( 'crm/screens/' . $requested, array( 'screen' => $meta ) );
+			$title = $meta['label'];
+
+			/**
+			 * Allow a module to supply the screen's content. Returning a
+			 * non-null value short-circuits the default template.
+			 *
+			 * @param string|null $content Screen content.
+			 * @param string      $slug    Screen slug.
+			 * @param array       $meta    Screen meta.
+			 */
+			$content = apply_filters( 'mbd_crm_screen_content', null, $requested, $meta );
+
+			if ( null === $content ) {
+				$content = $view->capture( 'crm/screens/' . $requested, array( 'screen' => $meta ) );
+			}
 
 			if ( '' === $content ) {
 				$content = Components::empty_state( $meta['label'], __( 'Nothing here yet.', 'mbd-crm' ) );

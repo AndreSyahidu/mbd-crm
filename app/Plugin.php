@@ -46,6 +46,13 @@ class Plugin {
 	private HealthCheck $health;
 
 	/**
+	 * Lead Intake module.
+	 *
+	 * @var \MBD\CRM\Leads\Module
+	 */
+	private \MBD\CRM\Leads\Module $leads;
+
+	/**
 	 * Build the component graph.
 	 */
 	public function __construct() {
@@ -53,6 +60,7 @@ class Plugin {
 		$this->assets   = new Assets();
 		$this->settings = new Settings();
 		$this->health   = new HealthCheck();
+		$this->leads    = new \MBD\CRM\Leads\Module();
 	}
 
 	/**
@@ -70,6 +78,7 @@ class Plugin {
 		$this->assets->register();
 		$this->settings->register();
 		$this->health->register();
+		$this->leads->register();
 	}
 
 	/**

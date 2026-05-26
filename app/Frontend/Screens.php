@@ -37,7 +37,7 @@ class Screens {
 			'leads'         => array(
 				'label' => __( 'Leads', 'mbd-crm' ),
 				'icon'  => 'dashicons-groups',
-				'cap'   => 'read',
+				'cap'   => \MBD\CRM\Leads\Capabilities::ACCESS_LEADS,
 			),
 			'follow-ups'    => array(
 				'label' => __( 'Follow-Ups', 'mbd-crm' ),

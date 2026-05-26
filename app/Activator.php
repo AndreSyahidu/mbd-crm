@@ -30,6 +30,9 @@ class Activator {
 	public static function activate(): void {
 		self::seed_options();
 
+		// Create module tables and CRM roles/capabilities.
+		\MBD\CRM\Leads\Module::install();
+
 		// Ensure the route exists before flushing.
 		mbd_crm()->router()->add_rewrite_rules();
 		flush_rewrite_rules();

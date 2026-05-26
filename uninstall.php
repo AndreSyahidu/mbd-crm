@@ -33,10 +33,37 @@ function mbd_crm_uninstall() {
 		return;
 	}
 
+	global $wpdb;
+
 	delete_option( MBD_CRM_UNINSTALL_OPTION );
 
-	// Placeholder: future data (custom tables, post meta, scheduled events)
-	// should be removed here as the CRM grows.
+	// Drop the Lead Intake module tables. Names are built from the trusted
+	// table prefix, not user input.
+	foreach ( array( 'mbd_crm_leads', 'mbd_crm_tasks', 'mbd_crm_audit' ) as $mbd_crm_table ) {
+		$table = $wpdb->prefix . $mbd_crm_table;
+		$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery
+	}
+
+	// Remove the CRM roles created on activation.
+	foreach ( array( 'mbd_crm_owner', 'mbd_crm_sales', 'mbd_crm_viewer' ) as $mbd_crm_role ) {
+		remove_role( $mbd_crm_role );
+	}
+
+	// Revoke lead capabilities from administrators.
+	$mbd_crm_admin = get_role( 'administrator' );
+	if ( $mbd_crm_admin ) {
+		$mbd_crm_caps = array(
+			'mbd_crm_access_leads',
+			'mbd_crm_create_leads',
+			'mbd_crm_edit_leads',
+			'mbd_crm_edit_others_leads',
+			'mbd_crm_view_all_leads',
+			'mbd_crm_assign_leads',
+		);
+		foreach ( $mbd_crm_caps as $mbd_crm_cap ) {
+			$mbd_crm_admin->remove_cap( $mbd_crm_cap );
+		}
+	}
 }
 
 if ( is_multisite() ) {
