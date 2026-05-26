@@ -34,6 +34,7 @@ class Audit {
 	public const SCORE          = 'lead.score_override';
 	public const OFFER          = 'lead.offer';
 	public const TASK           = 'lead.task';
+	public const HANDOFF        = 'lead.handoff';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -284,6 +285,15 @@ class Audit {
 				}
 				/* translators: %s: task title. */
 				return sprintf( __( 'Task completed: %s', 'mbd-crm' ), $title );
+			case self::HANDOFF:
+				$event = (string) ( $detail['event'] ?? '' );
+				if ( 'created' === $event ) {
+					return __( 'Project handoff started', 'mbd-crm' );
+				}
+				if ( 'completed' === $event ) {
+					return __( 'Project handed off to delivery', 'mbd-crm' );
+				}
+				return __( 'Project handoff updated', 'mbd-crm' );
 		}
 
 		return $entry->action;

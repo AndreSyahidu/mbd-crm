@@ -158,6 +158,13 @@ class Plugin {
 	private \MBD\CRM\Tasks\Module $tasks;
 
 	/**
+	 * Project handoff module.
+	 *
+	 * @var \MBD\CRM\Handoff\Module
+	 */
+	private \MBD\CRM\Handoff\Module $handoff;
+
+	/**
 	 * Import / Export module.
 	 *
 	 * @var \MBD\CRM\IO\Module
@@ -188,6 +195,7 @@ class Plugin {
 		$this->reporting     = new \MBD\CRM\Reporting\Module();
 		$this->reminders     = new \MBD\CRM\Reminders\Module();
 		$this->tasks         = new \MBD\CRM\Tasks\Module();
+		$this->handoff       = new \MBD\CRM\Handoff\Module();
 		$this->io            = new \MBD\CRM\IO\Module();
 	}
 
@@ -226,6 +234,7 @@ class Plugin {
 		$this->reporting->register();
 		$this->reminders->register();
 		$this->tasks->register();
+		$this->handoff->register();
 		$this->io->register();
 	}
 

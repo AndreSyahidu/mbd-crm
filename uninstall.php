@@ -64,6 +64,7 @@ function mbd_crm_uninstall() {
 		'mbd_crm_stakeholders',
 		'mbd_crm_lead_score_history',
 		'mbd_crm_offers',
+		'mbd_crm_handoffs',
 	);
 	foreach ( $mbd_crm_tables as $mbd_crm_table ) {
 		$table = $wpdb->prefix . $mbd_crm_table;
