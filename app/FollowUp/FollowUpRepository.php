@@ -65,6 +65,31 @@ class FollowUpRepository {
 	}
 
 	/**
+	 * Earliest follow-up timestamp per lead (lead_id => MIN(created_at)).
+	 * Used to compute first-response time.
+	 *
+	 * @return array<int, string>
+	 */
+	public function first_contact_map(): array {
+		global $wpdb;
+
+		$table = Schema::followups_table();
+
+		$rows = $wpdb->get_results(
+			"SELECT lead_id, MIN(created_at) AS first_at FROM {$table} GROUP BY lead_id" // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery
+		);
+
+		$map = array();
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $row ) {
+				$map[ (int) $row->lead_id ] = (string) $row->first_at;
+			}
+		}
+
+		return $map;
+	}
+
+	/**
 	 * Follow-up history for a lead, newest first.
 	 *
 	 * @param int $lead_id Lead ID.

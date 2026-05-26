@@ -66,6 +66,7 @@ class Schema {
 			competitor_note text NOT NULL,
 			lost_reason varchar(255) NOT NULL DEFAULT '',
 			project_draft tinyint(1) NOT NULL DEFAULT 0,
+			approved_at datetime DEFAULT NULL,
 			created_by bigint(20) unsigned NOT NULL DEFAULT 0,
 			created_at datetime DEFAULT NULL,
 			updated_at datetime DEFAULT NULL,

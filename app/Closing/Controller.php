@@ -208,6 +208,7 @@ class Controller {
 		$fields = array(
 			'status'        => 'approved',
 			'project_draft' => 1,
+			'approved_at'   => current_time( 'mysql' ),
 		);
 
 		// Default the final value to the offered value when not set.

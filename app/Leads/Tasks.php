@@ -78,6 +78,27 @@ class Tasks {
 	}
 
 	/**
+	 * All open tasks whose due date has passed (lead_id retained for scoping).
+	 *
+	 * @param string $now Current datetime (Y-m-d H:i:s).
+	 * @return array<int, object>
+	 */
+	public static function open_overdue( string $now ): array {
+		global $wpdb;
+
+		$table = Schema::tasks_table();
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} WHERE status = 'open' AND due_at IS NOT NULL AND due_at <> '' AND due_at < %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$now
+			)
+		);
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
 	 * Open tasks assigned to a user, newest first.
 	 *
 	 * @param int $user_id User ID.

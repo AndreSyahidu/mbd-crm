@@ -40,6 +40,9 @@ class Activator {
 		\MBD\CRM\Approval\Module::install();
 		\MBD\CRM\Closing\Module::install();
 
+		// Record the installed schema version for idempotent upgrades.
+		Migrator::stamp_version();
+
 		// Ensure the route exists before flushing.
 		mbd_crm()->router()->add_rewrite_rules();
 		flush_rewrite_rules();

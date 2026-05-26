@@ -146,6 +146,10 @@ class Plugin {
 	public function boot(): void {
 		load_plugin_textdomain( 'mbd-crm', false, dirname( plugin_basename( MBD_CRM_FILE ) ) . '/languages' );
 
+		// Run idempotent schema upgrades for existing installs when the
+		// plugin version changes (admin requests only).
+		add_action( 'admin_init', array( Migrator::class, 'maybe_upgrade' ) );
+
 		$this->router->register();
 		$this->assets->register();
 		$this->settings->register();

@@ -3,7 +3,7 @@
  * Plugin Name:       MBD CRM
  * Plugin URI:        https://github.com/andresyahidu/mbd-crm
  * Description:        Foundation for the MBD CRM application. Provides a front-end /crm route, an admin settings area, and a health check.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            MBD
@@ -21,7 +21,7 @@ if ( defined( 'MBD_CRM_VERSION' ) ) {
 	return;
 }
 
-define( 'MBD_CRM_VERSION', '0.1.0' );
+define( 'MBD_CRM_VERSION', '0.2.0' );
 define( 'MBD_CRM_FILE', __FILE__ );
 define( 'MBD_CRM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MBD_CRM_URL', plugin_dir_url( __FILE__ ) );

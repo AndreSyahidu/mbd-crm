@@ -11,6 +11,11 @@
  * @var array<string,int>   $funnel      Funnel stage counts.
  * @var string              $bottleneck Funnel bottleneck stage.
  * @var array<string,int>   $lost        Lost-reason breakdown.
+ * @var \MBD\CRM\Dashboard\Period $period Active reporting period.
+ * @var array<string,string> $periods    Period presets (key => label).
+ * @var string              $period_base Base dashboard URL.
+ * @var int                 $incomplete  Leads missing a follow-up timestamp.
+ * @var array<string,string> $formulas   Metric => formula text.
  * @var string              $widgets     Extra widget HTML (overdue follow-ups).
  */
 
@@ -26,10 +31,34 @@ $mbd_funnel_max = $funnel ? max( 1, max( $funnel ) ) : 1;
 			<?php foreach ( $tabs as $key => $label ) : ?>
 				<a
 					class="mbd-tab<?php echo $key === $view ? ' is-active' : ''; ?>"
-					href="<?php echo esc_url( Router::screen_url( 'dashboard' ) . '?view=' . $key ); ?>"
+					href="<?php echo esc_url( $period_base . '?view=' . $key . '&period=' . $period->key ); ?>"
 				><?php echo esc_html( $label ); ?></a>
 			<?php endforeach; ?>
 		</nav>
+	<?php endif; ?>
+
+	<div class="mbd-dash-toolbar">
+		<nav class="mbd-periods" aria-label="<?php esc_attr_e( 'Reporting period', 'mbd-crm' ); ?>">
+			<?php foreach ( $periods as $pkey => $plabel ) : ?>
+				<a
+					class="mbd-period<?php echo $pkey === $period->key ? ' is-active' : ''; ?>"
+					href="<?php echo esc_url( $period_base . '?view=' . $view . '&period=' . $pkey ); ?>"
+				><?php echo esc_html( $plabel ); ?></a>
+			<?php endforeach; ?>
+		</nav>
+		<span class="mbd-period__range"><?php echo esc_html( $period->range_label() ); ?></span>
+	</div>
+
+	<?php if ( $incomplete > 0 ) : ?>
+		<p class="mbd-notice mbd-notice--warning" role="status">
+			<?php
+			printf(
+				/* translators: %d: number of leads with no follow-up timestamp. */
+				esc_html__( 'Data may be incomplete: %d lead(s) have no follow-up activity, so response-time metrics exclude them.', 'mbd-crm' ),
+				(int) $incomplete
+			);
+			?>
+		</p>
 	<?php endif; ?>
 
 	<div class="mbd-kpis">
@@ -37,6 +66,9 @@ $mbd_funnel_max = $funnel ? max( 1, max( $funnel ) ) : 1;
 			<div class="mbd-kpi">
 				<span class="mbd-kpi__value"><?php echo esc_html( $kpi['value'] ); ?></span>
 				<span class="mbd-kpi__label"><?php echo esc_html( $kpi['label'] ); ?></span>
+				<?php if ( ! empty( $kpi['note'] ) ) : ?>
+					<span class="mbd-kpi__note"><?php echo esc_html( $kpi['note'] ); ?></span>
+				<?php endif; ?>
 			</div>
 		<?php endforeach; ?>
 	</div>
@@ -94,4 +126,14 @@ $mbd_funnel_max = $funnel ? max( 1, max( $funnel ) ) : 1;
 	</div>
 
 	<?php echo $widgets; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+
+	<details class="mbd-formulas">
+		<summary><?php esc_html_e( 'How these metrics are calculated', 'mbd-crm' ); ?></summary>
+		<dl class="mbd-dl">
+			<?php foreach ( $formulas as $name => $formula ) : ?>
+				<dt><?php echo esc_html( $name ); ?></dt>
+				<dd><?php echo esc_html( $formula ); ?></dd>
+			<?php endforeach; ?>
+		</dl>
+	</details>
 </div>

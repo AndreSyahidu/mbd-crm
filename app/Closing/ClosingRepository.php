@@ -86,8 +86,9 @@ class ClosingRepository {
 			'competitor_note'   => '%s',
 			'lost_reason'       => '%s',
 			'project_draft'     => '%d',
+			'approved_at'       => '%s',
 		);
-		$nullable = array( 'estimated_value', 'offered_value', 'final_value', 'expected_close_date', 'proposal_sent_at' );
+		$nullable = array( 'estimated_value', 'offered_value', 'final_value', 'expected_close_date', 'proposal_sent_at', 'approved_at' );
 
 		$data   = array();
 		$format = array();

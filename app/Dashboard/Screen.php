@@ -67,8 +67,12 @@ class Screen {
 	 * @return string
 	 */
 	private function render_dashboard(): string {
-		$scope   = Permissions::can_view_all() ? 'all' : 'own';
-		$metrics = new Metrics( $scope, get_current_user_id() );
+		$scope = Permissions::can_view_all() ? 'all' : 'own';
+
+		$period_key = isset( $_GET['period'] ) ? sanitize_key( wp_unslash( $_GET['period'] ) ) : 'all';
+		$period     = Period::from_key( $period_key );
+
+		$metrics = new Metrics( $scope, get_current_user_id(), $period );
 
 		$tabs = $this->available_views();
 		$view = isset( $_GET['view'] ) ? sanitize_key( wp_unslash( $_GET['view'] ) ) : '';
@@ -79,14 +83,19 @@ class Screen {
 		return $this->view->capture(
 			'crm/dashboard/main',
 			array(
-				'view'       => $view,
-				'tabs'       => $tabs,
-				'kpis'       => $this->kpis_for( $view, $metrics ),
-				'by_source'  => $metrics->leads_by_source(),
-				'funnel'     => $metrics->funnel(),
-				'bottleneck' => $metrics->funnel_bottleneck(),
-				'lost'       => $metrics->lost_reasons(),
-				'widgets'    => apply_filters( 'mbd_crm_dashboard_widgets', '' ),
+				'view'        => $view,
+				'tabs'        => $tabs,
+				'period'      => $period,
+				'periods'     => Period::presets(),
+				'period_base' => Router::screen_url( 'dashboard' ),
+				'kpis'        => $this->kpis_for( $view, $metrics ),
+				'by_source'   => $metrics->leads_by_source(),
+				'funnel'      => $metrics->funnel(),
+				'bottleneck'  => $metrics->funnel_bottleneck(),
+				'lost'        => $metrics->lost_reasons(),
+				'incomplete'  => $metrics->missing_response(),
+				'formulas'    => Metrics::formulas(),
+				'widgets'     => apply_filters( 'mbd_crm_dashboard_widgets', '' ),
 			)
 		);
 	}
@@ -134,27 +143,65 @@ class Screen {
 
 		if ( 'sales' === $view ) {
 			return array(
-				$this->kpi( __( 'My leads', 'mbd-crm' ), $metrics->total_leads() ),
+				$this->kpi( __( 'New leads', 'mbd-crm' ), $metrics->new_leads() ),
 				$this->kpi( __( 'Qualified', 'mbd-crm' ), $metrics->qualified() ),
-				$this->kpi( __( 'Overdue follow-up', 'mbd-crm' ), $metrics->overdue_followups() ),
-				$this->kpi( __( 'Weighted forecast', 'mbd-crm' ), number_format_i18n( $metrics->weighted_forecast() ) ),
-				$this->kpi( __( 'Closing rate', 'mbd-crm' ), $metrics->closing_rate() . '%' ),
+				$this->kpi( __( 'Overdue follow-up', 'mbd-crm' ), $metrics->overdue_followup_tasks() ),
+				$this->kpi( __( 'Avg response', 'mbd-crm' ), $this->hours( $metrics->avg_response_hours() ), $this->missing_note( $metrics->missing_response() ) ),
+				$this->kpi( __( 'Weighted forecast', 'mbd-crm' ), Formulas::idr( $metrics->weighted_forecast() ) ),
+				$this->kpi( __( 'Closing rate', 'mbd-crm' ), Formulas::pct( $metrics->closing_rate() ) ),
 			);
 		}
 
 		// Owner.
 		return array(
-			$this->kpi( __( 'Total leads', 'mbd-crm' ), $metrics->total_leads() ),
-			$this->kpi( __( 'Qualification rate', 'mbd-crm' ), $metrics->qualification_rate() . '%' ),
-			$this->kpi( __( 'Response overdue', 'mbd-crm' ), $metrics->response_overdue() ),
-			$this->kpi( __( 'Deposit valid', 'mbd-crm' ), $metrics->deposit_valid() ),
-			$this->kpi( __( 'Planning approved', 'mbd-crm' ), $metrics->planning_approved() ),
-			$this->kpi( __( 'Weighted forecast', 'mbd-crm' ), number_format_i18n( $metrics->weighted_forecast() ) ),
-			$this->kpi( __( 'Closing value', 'mbd-crm' ), number_format_i18n( $metrics->closing_value() ) ),
-			$this->kpi( __( 'Closing rate', 'mbd-crm' ), $metrics->closing_rate() . '%' ),
+			$this->kpi( __( 'New leads', 'mbd-crm' ), $metrics->new_leads() ),
+			$this->kpi( __( 'Qualification rate', 'mbd-crm' ), Formulas::pct( $metrics->qualification_rate() ) ),
+			$this->kpi( __( 'Pipeline value', 'mbd-crm' ), Formulas::idr( $metrics->pipeline_value() ) ),
+			$this->kpi( __( 'Weighted forecast', 'mbd-crm' ), Formulas::idr( $metrics->weighted_forecast() ) ),
+			$this->kpi( __( 'Closing value', 'mbd-crm' ), Formulas::idr( $metrics->closing_value() ) ),
+			$this->kpi( __( 'Closing rate', 'mbd-crm' ), Formulas::pct( $metrics->closing_rate() ) ),
+			$this->kpi( __( 'Lost rate', 'mbd-crm' ), Formulas::pct( $metrics->lost_rate() ) ),
+			$this->kpi( __( 'Avg response', 'mbd-crm' ), $this->hours( $metrics->avg_response_hours() ), $this->missing_note( $metrics->missing_response() ) ),
+			$this->kpi( __( 'Avg closing', 'mbd-crm' ), $this->days( $metrics->avg_closing_days() ) ),
+			$this->kpi( __( 'SLA breach', 'mbd-crm' ), $metrics->sla_breach_count() ),
+			$this->kpi( __( 'Overdue follow-up', 'mbd-crm' ), $metrics->overdue_followup_tasks() ),
 			$this->kpi( __( 'Pending approval', 'mbd-crm' ), $metrics->pending_approval() ),
-			$this->kpi( __( 'Overdue follow-up', 'mbd-crm' ), $metrics->overdue_followups() ),
 		);
+	}
+
+	/**
+	 * Format an optional hours value.
+	 *
+	 * @param float|null $hours Hours, or null.
+	 * @return string
+	 */
+	private function hours( ?float $hours ): string {
+		return null === $hours ? '—' : $hours . __( 'h', 'mbd-crm' );
+	}
+
+	/**
+	 * Format an optional days value.
+	 *
+	 * @param float|null $days Days, or null.
+	 * @return string
+	 */
+	private function days( ?float $days ): string {
+		return null === $days ? '—' : $days . __( 'd', 'mbd-crm' );
+	}
+
+	/**
+	 * Build a "missing response" note when leads lack a follow-up.
+	 *
+	 * @param int $missing Count of leads with no follow-up.
+	 * @return string
+	 */
+	private function missing_note( int $missing ): string {
+		if ( $missing < 1 ) {
+			return '';
+		}
+
+		/* translators: %d: number of leads with no follow-up. */
+		return sprintf( __( '%d w/o follow-up', 'mbd-crm' ), $missing );
 	}
 
 	/**
@@ -162,12 +209,14 @@ class Screen {
 	 *
 	 * @param string     $label Label.
 	 * @param string|int $value Value.
-	 * @return array{label:string,value:string}
+	 * @param string     $note  Optional note (incomplete-data hint).
+	 * @return array{label:string,value:string,note:string}
 	 */
-	private function kpi( string $label, $value ): array {
+	private function kpi( string $label, $value, string $note = '' ): array {
 		return array(
 			'label' => $label,
 			'value' => (string) $value,
+			'note'  => $note,
 		);
 	}
 

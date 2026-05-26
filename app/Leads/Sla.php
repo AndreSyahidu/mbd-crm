@@ -43,10 +43,13 @@ class Sla {
 	public static function compute_due( string $from_mysql ): string {
 		$start = strtotime( $from_mysql );
 		if ( false === $start ) {
-			$start = time();
+			$start = (int) current_time( 'timestamp' );
 		}
 
-		return gmdate( 'Y-m-d H:i:s', $start + ( self::hours() * HOUR_IN_SECONDS ) );
+		// Use date() (not gmdate()) so the stored due time shares the same
+		// site-local basis as current_time('mysql'), which every SLA
+		// comparison uses. This avoids a UTC-vs-local skew.
+		return date( 'Y-m-d H:i:s', $start + ( self::hours() * HOUR_IN_SECONDS ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 	}
 
 	/**
@@ -66,9 +69,8 @@ class Sla {
 			);
 		}
 
-		$due = ! empty( $lead->sla_due_at ) ? strtotime( $lead->sla_due_at ) : false;
-
-		if ( $due && current_time( 'timestamp' ) > $due ) {
+		// Compare site-local datetime strings (same basis as compute_due()).
+		if ( ! empty( $lead->sla_due_at ) && current_time( 'mysql' ) > $lead->sla_due_at ) {
 			return array(
 				'label'   => __( 'Breached', 'mbd-crm' ),
 				'variant' => 'danger',
