@@ -144,6 +144,13 @@ class Plugin {
 	private \MBD\CRM\Reporting\Module $reporting;
 
 	/**
+	 * Notifications & reminders module.
+	 *
+	 * @var \MBD\CRM\Reminders\Module
+	 */
+	private \MBD\CRM\Reminders\Module $reminders;
+
+	/**
 	 * Import / Export module.
 	 *
 	 * @var \MBD\CRM\IO\Module
@@ -172,6 +179,7 @@ class Plugin {
 		$this->scoring       = new \MBD\CRM\Scoring\Module();
 		$this->offers        = new \MBD\CRM\Offers\Module();
 		$this->reporting     = new \MBD\CRM\Reporting\Module();
+		$this->reminders     = new \MBD\CRM\Reminders\Module();
 		$this->io            = new \MBD\CRM\IO\Module();
 	}
 
@@ -208,6 +216,7 @@ class Plugin {
 		$this->scoring->register();
 		$this->offers->register();
 		$this->reporting->register();
+		$this->reminders->register();
 		$this->io->register();
 	}
 
