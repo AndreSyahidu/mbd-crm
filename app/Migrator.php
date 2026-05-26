@@ -54,6 +54,7 @@ class Migrator {
 		Approval\Schema::create_table();
 		Closing\Schema::create_tables();
 		Stakeholders\Schema::create_table();
+		Scoring\Schema::create_table();
 	}
 
 	/**

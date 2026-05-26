@@ -123,6 +123,13 @@ class Plugin {
 	private \MBD\CRM\Duplicates\Module $duplicates;
 
 	/**
+	 * Lead scoring module.
+	 *
+	 * @var \MBD\CRM\Scoring\Module
+	 */
+	private \MBD\CRM\Scoring\Module $scoring;
+
+	/**
 	 * Import / Export module.
 	 *
 	 * @var \MBD\CRM\IO\Module
@@ -148,6 +155,7 @@ class Plugin {
 		$this->dashboard     = new \MBD\CRM\Dashboard\Module();
 		$this->stakeholders  = new \MBD\CRM\Stakeholders\Module();
 		$this->duplicates    = new \MBD\CRM\Duplicates\Module();
+		$this->scoring       = new \MBD\CRM\Scoring\Module();
 		$this->io            = new \MBD\CRM\IO\Module();
 	}
 
@@ -181,6 +189,7 @@ class Plugin {
 		$this->dashboard->register();
 		$this->stakeholders->register();
 		$this->duplicates->register();
+		$this->scoring->register();
 		$this->io->register();
 	}
 

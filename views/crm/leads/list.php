@@ -18,6 +18,7 @@ use MBD\CRM\Leads\Permissions;
 use MBD\CRM\Leads\Sla;
 use MBD\CRM\Leads\Stage;
 use MBD\CRM\Router;
+use MBD\CRM\Scoring\Scorer;
 
 defined( 'ABSPATH' ) || exit;
 ?>
@@ -56,6 +57,7 @@ defined( 'ABSPATH' ) || exit;
 				<thead>
 					<tr>
 						<th><?php esc_html_e( 'Lead', 'mbd-crm' ); ?></th>
+						<th><?php esc_html_e( 'Score', 'mbd-crm' ); ?></th>
 						<th><?php esc_html_e( 'Status', 'mbd-crm' ); ?></th>
 						<th><?php esc_html_e( 'Quality', 'mbd-crm' ); ?></th>
 						<th><?php esc_html_e( 'Stage age', 'mbd-crm' ); ?></th>
@@ -79,6 +81,10 @@ defined( 'ABSPATH' ) || exit;
 								<a class="mbd-table__primary" href="<?php echo esc_url( $view_url ); ?>">
 									<?php echo esc_html( '' !== $lead->name ? $lead->name : __( '(no name)', 'mbd-crm' ) ); ?>
 								</a>
+							</td>
+							<td>
+								<strong><?php echo (int) ( $lead->score ?? 0 ); ?></strong>
+								<?php echo Components::chip( Scorer::temperature_label( (string) ( $lead->temperature ?? 'low_fit' ) ), Scorer::temperature_variant( (string) ( $lead->temperature ?? 'low_fit' ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</td>
 							<td><?php echo Components::chip( Options::label( 'statuses', $lead->status ), Options::status_variant( $lead->status ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
 							<td><?php echo Components::chip( $lead->quality, Options::quality_variant( $lead->quality ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>

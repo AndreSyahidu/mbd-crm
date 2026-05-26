@@ -40,6 +40,7 @@ class Activator {
 		\MBD\CRM\Approval\Module::install();
 		\MBD\CRM\Closing\Module::install();
 		\MBD\CRM\Stakeholders\Module::install();
+		\MBD\CRM\Scoring\Module::install();
 
 		// Record the installed schema version for idempotent upgrades.
 		Migrator::stamp_version();

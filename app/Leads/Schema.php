@@ -100,6 +100,10 @@ class Schema {
 			reactivation_at datetime DEFAULT NULL,
 			reactivation_reason varchar(255) NOT NULL DEFAULT '',
 			merged_into_lead_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			score smallint(5) unsigned NOT NULL DEFAULT 0,
+			temperature varchar(12) NOT NULL DEFAULT 'low_fit',
+			score_locked tinyint(1) NOT NULL DEFAULT 0,
+			score_override_reason varchar(255) NOT NULL DEFAULT '',
 			created_by bigint(20) unsigned NOT NULL DEFAULT 0,
 			created_at datetime DEFAULT NULL,
 			updated_at datetime DEFAULT NULL,
@@ -110,7 +114,9 @@ class Schema {
 			KEY stage (stage),
 			KEY lifecycle (lifecycle),
 			KEY stale_flag (stale_flag),
-			KEY whatsapp_normalized (whatsapp_normalized)
+			KEY whatsapp_normalized (whatsapp_normalized),
+			KEY score (score),
+			KEY temperature (temperature)
 		) {$charset_collate};";
 
 		$stage_history = self::stage_history_table();

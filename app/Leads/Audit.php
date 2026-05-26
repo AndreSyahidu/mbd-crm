@@ -31,6 +31,7 @@ class Audit {
 	public const LIFECYCLE      = 'lead.lifecycle';
 	public const STAKEHOLDER    = 'lead.stakeholder';
 	public const MERGE          = 'lead.merge';
+	public const SCORE          = 'lead.score_override';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -252,6 +253,9 @@ class Audit {
 			case self::MERGE:
 				/* translators: 1: secondary lead id, 2: primary lead id. */
 				return sprintf( __( 'Merged lead #%1$d into #%2$d', 'mbd-crm' ), (int) ( $detail['from'] ?? 0 ), (int) ( $detail['into'] ?? 0 ) );
+			case self::SCORE:
+				/* translators: 1: score, 2: reason. */
+				return sprintf( __( 'Score overridden to %1$d: %2$s', 'mbd-crm' ), (int) ( $detail['score'] ?? 0 ), (string) ( $detail['reason'] ?? '' ) );
 		}
 
 		return $entry->action;
