@@ -151,6 +151,13 @@ class Plugin {
 	private \MBD\CRM\Reminders\Module $reminders;
 
 	/**
+	 * Task management module.
+	 *
+	 * @var \MBD\CRM\Tasks\Module
+	 */
+	private \MBD\CRM\Tasks\Module $tasks;
+
+	/**
 	 * Import / Export module.
 	 *
 	 * @var \MBD\CRM\IO\Module
@@ -180,6 +187,7 @@ class Plugin {
 		$this->offers        = new \MBD\CRM\Offers\Module();
 		$this->reporting     = new \MBD\CRM\Reporting\Module();
 		$this->reminders     = new \MBD\CRM\Reminders\Module();
+		$this->tasks         = new \MBD\CRM\Tasks\Module();
 		$this->io            = new \MBD\CRM\IO\Module();
 	}
 
@@ -217,6 +225,7 @@ class Plugin {
 		$this->offers->register();
 		$this->reporting->register();
 		$this->reminders->register();
+		$this->tasks->register();
 		$this->io->register();
 	}
 

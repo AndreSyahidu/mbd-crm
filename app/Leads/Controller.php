@@ -313,7 +313,6 @@ class Controller {
 				'sla'           => Sla::display( $lead ),
 				'whatsapp_link' => $whatsapp,
 				'audit'         => Audit::recent_for_lead( $lead_id ),
-				'tasks'         => Tasks::for_lead( $lead_id ),
 				'edit_url'      => Router::screen_url( 'leads' ) . '?action=edit&lead=' . $lead_id,
 				'list_url'      => Router::screen_url( 'leads' ),
 				'notice'        => $this->flash_notice(),

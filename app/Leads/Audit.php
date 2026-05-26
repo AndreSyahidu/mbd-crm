@@ -33,6 +33,7 @@ class Audit {
 	public const MERGE          = 'lead.merge';
 	public const SCORE          = 'lead.score_override';
 	public const OFFER          = 'lead.offer';
+	public const TASK           = 'lead.task';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -270,6 +271,19 @@ class Audit {
 				);
 				/* translators: %d: offer version number. */
 				return sprintf( $map[ $event ] ?? __( 'Offer v%d updated', 'mbd-crm' ), $ver );
+			case self::TASK:
+				$event = (string) ( $detail['event'] ?? '' );
+				$title = (string) ( $detail['title'] ?? '' );
+				if ( 'added' === $event ) {
+					/* translators: %s: task title. */
+					return sprintf( __( 'Task added: %s', 'mbd-crm' ), $title );
+				}
+				if ( 'reopened' === $event ) {
+					/* translators: %s: task title. */
+					return sprintf( __( 'Task reopened: %s', 'mbd-crm' ), $title );
+				}
+				/* translators: %s: task title. */
+				return sprintf( __( 'Task completed: %s', 'mbd-crm' ), $title );
 		}
 
 		return $entry->action;

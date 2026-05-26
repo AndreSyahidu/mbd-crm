@@ -129,22 +129,6 @@ $mbd_budget   = ( null !== $lead->estimated_budget && '' !== $lead->estimated_bu
 			?>
 
 			<section class="mbd-panel">
-				<h3 class="mbd-panel__title"><?php esc_html_e( 'Tasks', 'mbd-crm' ); ?></h3>
-				<?php if ( empty( $tasks ) ) : ?>
-					<p class="mbd-field__hint"><?php esc_html_e( 'No tasks yet.', 'mbd-crm' ); ?></p>
-				<?php else : ?>
-					<ul class="mbd-list">
-						<?php foreach ( $tasks as $task ) : ?>
-							<li class="mbd-list__item">
-								<span><?php echo esc_html( $task->title ); ?></span>
-								<?php echo Components::chip( $task->status, 'open' === $task->status ? 'warning' : 'success' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				<?php endif; ?>
-			</section>
-
-			<section class="mbd-panel">
 				<h3 class="mbd-panel__title"><?php esc_html_e( 'Audit trail', 'mbd-crm' ); ?></h3>
 				<?php if ( empty( $audit ) ) : ?>
 					<p class="mbd-field__hint"><?php esc_html_e( 'No activity recorded.', 'mbd-crm' ); ?></p>

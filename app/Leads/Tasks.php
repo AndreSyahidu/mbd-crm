@@ -141,4 +141,61 @@ class Tasks {
 
 		return is_array( $rows ) ? $rows : array();
 	}
+
+	/**
+	 * Find a single task by ID.
+	 *
+	 * @param int $id Task ID.
+	 * @return object|null
+	 */
+	public static function find( int $id ): ?object {
+		global $wpdb;
+
+		$table = Schema::tasks_table();
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} WHERE id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$id
+			)
+		);
+
+		return $row ?: null;
+	}
+
+	/**
+	 * Mark a task done.
+	 *
+	 * @param int $id Task ID.
+	 * @return void
+	 */
+	public static function complete( int $id ): void {
+		global $wpdb;
+
+		$wpdb->update(
+			Schema::tasks_table(),
+			array( 'status' => 'done', 'completed_at' => current_time( 'mysql' ) ),
+			array( 'id' => $id ),
+			array( '%s', '%s' ),
+			array( '%d' )
+		);
+	}
+
+	/**
+	 * Reopen a completed task.
+	 *
+	 * @param int $id Task ID.
+	 * @return void
+	 */
+	public static function reopen( int $id ): void {
+		global $wpdb;
+
+		$wpdb->update(
+			Schema::tasks_table(),
+			array( 'status' => 'open', 'completed_at' => null ),
+			array( 'id' => $id ),
+			array( '%s', '%s' ),
+			array( '%d' )
+		);
+	}
 }

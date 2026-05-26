@@ -141,9 +141,11 @@ class Schema {
 			status varchar(20) NOT NULL DEFAULT 'open',
 			due_at datetime DEFAULT NULL,
 			created_at datetime DEFAULT NULL,
+			completed_at datetime DEFAULT NULL,
 			PRIMARY KEY  (id),
 			KEY lead_id (lead_id),
-			KEY assigned_to (assigned_to)
+			KEY assigned_to (assigned_to),
+			KEY status (status)
 		) {$charset_collate};";
 
 		$sql[] = "CREATE TABLE {$audit} (
