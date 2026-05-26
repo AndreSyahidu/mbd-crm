@@ -278,6 +278,21 @@ class PlanningRepository {
 	}
 
 	/**
+	 * All planning records.
+	 *
+	 * @return array<int, object>
+	 */
+	public function all(): array {
+		global $wpdb;
+
+		$table = Schema::plannings_table();
+
+		$rows = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY id DESC" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
 	 * Plannings in a given status.
 	 *
 	 * @param string $status Status key.

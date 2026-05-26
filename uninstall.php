@@ -36,6 +36,7 @@ function mbd_crm_uninstall() {
 	global $wpdb;
 
 	delete_option( MBD_CRM_UNINSTALL_OPTION );
+	delete_option( 'mbd_crm_master_options' );
 
 	// Drop the Lead Intake module tables. Names are built from the trusted
 	// table prefix, not user input.

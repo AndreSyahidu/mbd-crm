@@ -109,6 +109,13 @@ class Plugin {
 	private \MBD\CRM\Dashboard\Module $dashboard;
 
 	/**
+	 * Import / Export module.
+	 *
+	 * @var \MBD\CRM\IO\Module
+	 */
+	private \MBD\CRM\IO\Module $io;
+
+	/**
 	 * Build the component graph.
 	 */
 	public function __construct() {
@@ -125,6 +132,7 @@ class Plugin {
 		$this->approval      = new \MBD\CRM\Approval\Module();
 		$this->closing       = new \MBD\CRM\Closing\Module();
 		$this->dashboard     = new \MBD\CRM\Dashboard\Module();
+		$this->io            = new \MBD\CRM\IO\Module();
 	}
 
 	/**
@@ -151,6 +159,7 @@ class Plugin {
 		$this->approval->register();
 		$this->closing->register();
 		$this->dashboard->register();
+		$this->io->register();
 	}
 
 	/**

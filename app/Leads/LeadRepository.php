@@ -121,6 +121,30 @@ class LeadRepository {
 	}
 
 	/**
+	 * Whether a lead already exists with the same WhatsApp number and name
+	 * (used for import de-duplication).
+	 *
+	 * @param string $whatsapp WhatsApp digits.
+	 * @param string $name     Lead name.
+	 * @return bool
+	 */
+	public function exists_by_whatsapp_name( string $whatsapp, string $name ): bool {
+		global $wpdb;
+
+		$table = Schema::leads_table();
+
+		$id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT id FROM {$table} WHERE whatsapp = %s AND name = %s LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$whatsapp,
+				$name
+			)
+		);
+
+		return ! empty( $id );
+	}
+
+	/**
 	 * Insert a new lead, start its response SLA, and announce creation.
 	 *
 	 * @param array<string, mixed> $data    Sanitised field values.

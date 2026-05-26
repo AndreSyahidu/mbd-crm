@@ -134,6 +134,27 @@ class Audit {
 	}
 
 	/**
+	 * Most recent audit entries across all leads (for export).
+	 *
+	 * @param int $limit Maximum rows.
+	 * @return array<int, object>
+	 */
+	public static function export( int $limit = 1000 ): array {
+		global $wpdb;
+
+		$table = Schema::audit_table();
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} ORDER BY id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$limit
+			)
+		);
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
 	 * Human summary for an audit row.
 	 *
 	 * @param object $entry Audit row.
