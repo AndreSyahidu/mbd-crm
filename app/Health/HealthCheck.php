@@ -71,7 +71,7 @@ class HealthCheck {
 			'rewrite_rule' => array(
 				'label'  => __( 'CRM route', 'mbd-crm' ),
 				'ok'     => $this->is_route_registered(),
-				'detail' => '/' . MBD_CRM_SLUG,
+				'detail' => '/' . Router::ROUTE_BASE,
 			),
 		);
 	}

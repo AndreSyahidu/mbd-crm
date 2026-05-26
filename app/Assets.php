@@ -39,7 +39,7 @@ class Assets {
 		wp_enqueue_style(
 			'mbd-crm-app',
 			MBD_CRM_URL . 'assets/css/app.css',
-			array(),
+			array( 'dashicons' ),
 			MBD_CRM_VERSION
 		);
 
