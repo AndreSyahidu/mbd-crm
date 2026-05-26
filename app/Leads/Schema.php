@@ -84,6 +84,7 @@ class Schema {
 			sla_started_at datetime DEFAULT NULL,
 			sla_due_at datetime DEFAULT NULL,
 			sla_status varchar(12) NOT NULL DEFAULT 'running',
+			deposit_sla_due datetime DEFAULT NULL,
 			created_by bigint(20) unsigned NOT NULL DEFAULT 0,
 			created_at datetime DEFAULT NULL,
 			updated_at datetime DEFAULT NULL,

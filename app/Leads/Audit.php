@@ -23,6 +23,7 @@ class Audit {
 	public const FOLLOWUP       = 'lead.followup_logged';
 	public const PROMISE_MADE   = 'lead.promise_created';
 	public const PROMISE_STATUS = 'lead.promise_status_changed';
+	public const DISCOVERY      = 'lead.discovery';
 
 	/**
 	 * Hook the audit recorder onto lead lifecycle actions.
@@ -180,6 +181,13 @@ class Audit {
 					__( 'Promise %1$s → %2$s', 'mbd-crm' ),
 					(string) ( $detail['from'] ?? '' ),
 					(string) ( $detail['to'] ?? '' )
+				);
+			case self::DISCOVERY:
+				return sprintf(
+					/* translators: 1: discovery event, 2: discovery type. */
+					__( 'Discovery %1$s (%2$s)', 'mbd-crm' ),
+					(string) ( $detail['event'] ?? '' ),
+					(string) ( $detail['type'] ?? '' )
 				);
 		}
 

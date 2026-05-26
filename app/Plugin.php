@@ -67,6 +67,13 @@ class Plugin {
 	private \MBD\CRM\FollowUp\Module $followup;
 
 	/**
+	 * Discovery / Survey module.
+	 *
+	 * @var \MBD\CRM\Discovery\Module
+	 */
+	private \MBD\CRM\Discovery\Module $discovery;
+
+	/**
 	 * Build the component graph.
 	 */
 	public function __construct() {
@@ -77,6 +84,7 @@ class Plugin {
 		$this->leads         = new \MBD\CRM\Leads\Module();
 		$this->qualification = new \MBD\CRM\Qualification\Module();
 		$this->followup      = new \MBD\CRM\FollowUp\Module();
+		$this->discovery     = new \MBD\CRM\Discovery\Module();
 	}
 
 	/**
@@ -97,6 +105,7 @@ class Plugin {
 		$this->leads->register();
 		$this->qualification->register();
 		$this->followup->register();
+		$this->discovery->register();
 	}
 
 	/**

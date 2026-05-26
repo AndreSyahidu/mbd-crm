@@ -273,6 +273,29 @@ class LeadRepository {
 	}
 
 	/**
+	 * Set the deposit-collection SLA due time (written by the Discovery module
+	 * when a discovery is completed).
+	 *
+	 * @param int         $id  Lead ID.
+	 * @param string|null $due Due datetime (Y-m-d H:i:s) or null.
+	 * @return void
+	 */
+	public function set_deposit_sla( int $id, ?string $due ): void {
+		global $wpdb;
+
+		$wpdb->update(
+			Schema::leads_table(),
+			array(
+				'deposit_sla_due' => ( null === $due || '' === $due ) ? null : $due,
+				'updated_at'      => current_time( 'mysql' ),
+			),
+			array( 'id' => $id ),
+			array( '%s', '%s' ),
+			array( '%d' )
+		);
+	}
+
+	/**
 	 * Set a lead's qualification status (written by the Qualification module).
 	 *
 	 * @param int    $id     Lead ID.

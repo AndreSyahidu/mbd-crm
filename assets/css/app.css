@@ -414,3 +414,9 @@ html, body.mbd-crm {
 	.mbd-detail__grid { grid-template-columns: 1fr; }
 	.mbd-dl { grid-template-columns: 130px 1fr; }
 }
+
+/* Discovery panel */
+.mbd-disc { padding: 10px 0; border-bottom: 1px solid var(--mbd-border); }
+.mbd-disc:last-child { border-bottom: 0; }
+.mbd-disc__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mbd-disc__field { margin: 6px 0 0; font-size: 13px; }
